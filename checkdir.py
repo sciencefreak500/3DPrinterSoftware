@@ -4,6 +4,7 @@ import os.path
 import pickle
 import tkFileDialog as filedialog
 from Tkinter import *
+import shutil
 
 import time
 
@@ -19,24 +20,29 @@ def SetFirstRun():  #refresh setup.inf as if first run
     DirLoc = ''
     with open('setup.inf','w') as f:
         pickle.dump([FirstRun, DirLoc], f)
+    InitializeProgram()
 
 
 def InitializeProgram():  #If first time running, set location, else pull from setup.inf
     global DirLocation;
-    with open('setup.inf') as f:
-        FirstRun, DirLoc = pickle.load(f)
-    if FirstRun == True:
-        root = Tk()
-        DirLocation = filedialog.askdirectory(initialdir='.')
-        root.destroy()
-        FirstRun = False
-        DirLoc = DirLocation
-        with open('setup.inf','w') as f:
-            pickle.dump([FirstRun, DirLoc], f)
-    else:
-        DirLocation = DirLoc
-        print DirLoc
-        
+    try:
+        with open('setup.inf') as f:
+            FirstRun, DirLoc = pickle.load(f)
+        if FirstRun == True:
+            root = Tk()
+            DirLocation = filedialog.askdirectory(initialdir='.')
+            root.destroy()
+            FirstRun = False
+            DirLoc = DirLocation
+            with open('setup.inf','w') as f:
+                pickle.dump([FirstRun, DirLoc], f)
+        else:
+            DirLocation = DirLoc
+            print DirLoc
+    except:
+        file = open('setup.inf','w')
+        file.close()
+        SetFirstRun()
         
 def CheckDirChanges(): #check directory is empty, else print files/folders listed
     try:
@@ -56,15 +62,7 @@ def CheckDirChanges(): #check directory is empty, else print files/folders liste
 
 
 ####### MAIN SCRIPT #######
-'''     
-#SetFirstRun()
-InitializeProgram()
 
-while True:
-    CheckDirChanges()
-    time.sleep(1)
-
-'''
 
 InitializeProgram()
 
@@ -77,7 +75,10 @@ class Application(Frame):
         print "minimizing"
         root.wm_state('withdrawn')
         self.after(5000,self.MakeNormal)
-        
+
+    def SendToFolder(self):
+        filename = filedialog.askopenfilename()
+        shutil.copy(filename,DirLocation)
 
     def LoopDir(self):
         CheckDirChanges()
@@ -89,11 +90,17 @@ class Application(Frame):
         self.background["command"] = self.PushBackground
         self.background.pack({"side": "left"})
 
+        self.background = Button(self)
+        self.background["text"] = "Send to Printer",
+        self.background["command"] = self.SendToFolder
+        self.background.pack({"side": "left"}) 
+
     def __init__(self, master=None):
         Frame.__init__(self, master)
         self.pack()
         self.createWidgets()
         self.LoopDir()
+        master.minsize(width = 480,height = 480)
         
         
 
