@@ -5,9 +5,6 @@ import pickle
 import tkFileDialog as filedialog
 from Tkinter import *
 import shutil
-os.environ['TKDND_LIBRARY'] = 'TKDND_DIR'
-from tkdnd_wrapper import TkDND
-
 
 ####### SCRIPT VARIABLES #######
 
@@ -96,10 +93,8 @@ class Application(Frame):
             elif len(PrintList) < len(self.CompareList):
                 temp = list(set(self.CompareList) - set(PrintList))
                 for i in temp:
-                    item = self.QueueList.selection_set(ACTIVE,i)
-                    for index,j in enumerate(self.CompareList):
-                        if item == index:
-                            self.QueueList.delete(index,index)
+                    print "select i in queue"
+                    print "delete "
                     
             else:
                 print "just different queue order"
@@ -133,13 +128,10 @@ class Application(Frame):
         
 
 root = Tk()
-dnd = TkDND(root)
-
 entry = Entry()
 def handle(event):
     event.widget.insert(0, event.data)
 
-dnd.bindtarget(entry, handle, 'text/uri-list')
 
 app = Application(master=root)
 app.mainloop()
