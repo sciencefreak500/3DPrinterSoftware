@@ -72,7 +72,7 @@ def CheckDirChanges(): #check directory is empty, else print files/folders liste
 InitializeProgram()
 
 class Application(Frame):
-
+    
     def MakeNormal(self):
         root.wm_state('normal')
         
@@ -87,7 +87,23 @@ class Application(Frame):
 
     def LoopDir(self):
         PrintList = CheckDirChanges()
-        #self.QueueList.insert
+        if PrintList != self.CompareList:
+            if len(PrintList) > len(self.CompareList):
+                print "adding to list"
+                temp = list(set(PrintList) - set(self.CompareList))
+                for i in temp:
+                    self.QueueList.insert(END,i)
+            elif len(PrintList) < len(self.CompareList):
+                temp = list(set(self.CompareList) - set(PrintList))
+                for i in temp:
+                    item = self.QueueList.selection_set(ACTIVE,i)
+                    for index,j in enumerate(self.CompareList):
+                        if item == index:
+                            self.QueueList.delete(index,index)
+                    
+            else:
+                print "just different queue order"
+        self.CompareList = PrintList
         self.after(1000, self.LoopDir)
 
     def createWidgets(self):
@@ -104,11 +120,12 @@ class Application(Frame):
         self.QueueList = Listbox(self)
         self.QueueList.grid(row=1,column=0, sticky = S, columnspan = 2, pady = 10)
         
+        
 
     def __init__(self, master=None):
+        self.CompareList = []
         Frame.__init__(self, master)
         self.grid()
-        
         self.createWidgets()
         self.LoopDir()
         
