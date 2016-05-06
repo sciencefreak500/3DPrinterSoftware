@@ -1,0 +1,6 @@
+#example print format, will be named numerically according to print order
+mode=n or t
+file=/path/to/file
+number="number of times to print"
+start_time="start time of print"
+duration="duration to print this file"
