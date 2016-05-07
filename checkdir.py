@@ -49,7 +49,6 @@ def CheckDirChanges(): #check directory is empty, else print files/folders liste
             print "empty"
             FilesInDirectory
         else:
-            print FilesInDirectory
             return FilesInDirectory
             
     except OSError as ex:
@@ -83,29 +82,63 @@ class Application(Frame):
         filename = filedialog.askopenfilename()
         shutil.copy(filename,DirLocation)
 
+    def MoveUp(self):
+        l = self.QueueList
+        try:    
+            pos = list(l.curselection())[0]
+        except:
+            return
+        if pos == 0:
+            print "is zero"
+            return
+        text = l.get(pos)
+        l.delete(pos)
+        l.insert(pos-1, text)
+        l.selection_set(pos-1)
+
+
+    def MoveDown(self):
+        l = self.QueueList
+        try:    
+            pos = list(l.curselection())[0]
+        except:
+            return
+        if pos == len(l.get(0, END))-1:
+            print "is end"
+            return
+        text = l.get(pos)
+        l.delete(pos)
+        l.insert(pos+1, text)
+        l.selection_set(pos+1)
+        
+
     def LoopDir(self):
         PrintList = CheckDirChanges()
-        FinalQueueList = []
         if PrintList != self.CompareList:
             try:
                 if len(PrintList) > len(self.CompareList):  ##something needs to be added
-                    print "adding to list"
                     temp = list(set(PrintList) - set(self.CompareList))
                     for i in temp:
                         self.QueueList.insert(END,i)
+
                 elif len(PrintList) < len(self.CompareList):   ##something needs to be removed
                     temp = list(set(self.CompareList) - set(PrintList))
                     for i in temp:
-                        print "select i in queue"
-                        print "delete "
+                        gone = self.CompareList.index(i)
+                        self.QueueList.delete(gone,gone)
+
+                elif set(PrintList) == set(self.CompareList):
+                    pass
                         
-                else:   ##order of queue needs to change
-                    print "just different queue order"
-                    
+                else:   ##Something bad happened, reset list
+                    self.QueueList.delete(0, END)
+                    for i in PrintList:
+                        self.QueueList.insert(END,i)
             except:
                 print "something wrong"
-        self.CompareList = PrintList
+
         
+        self.CompareList = self.QueueList.get(0,END)
         self.after(1000, self.LoopDir)
 
     def createWidgets(self):
@@ -118,6 +151,16 @@ class Application(Frame):
         self.background["text"] = "Send to Printer",
         self.background["command"] = self.SendToFolder
         self.background.grid(row=0,column=1, sticky = E)
+
+        self.background = Button(self)
+        self.background["text"] = "Move Up Queue",
+        self.background["command"] = self.MoveUp
+        self.background.grid(row=2,column=1, sticky = E)
+
+        self.background = Button(self)
+        self.background["text"] = "Move Down Queue",
+        self.background["command"] = self.MoveDown
+        self.background.grid(row=2,column=2, sticky = E)
 
         self.QueueList = Listbox(self)
         self.QueueList.grid(row=1,column=0, sticky = S, columnspan = 2, pady = 10)
