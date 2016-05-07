@@ -14,7 +14,7 @@ File=str(DirLoc+checkdir.Queue1)
 printer=/path/to/printer
 while 1=1:
 	if printButton=1:
-		while File!=str(DirLoc) #retuturns files to print:
+		while File!=str(DirLoc) #returns files to print:
 			shutil.move(File, printer) #need to find out how printer processes files to send them over correctly
 			os.remove(File)
 		

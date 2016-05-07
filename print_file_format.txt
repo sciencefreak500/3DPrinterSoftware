@@ -1,6 +1,10 @@
 #example print format, will be named numerically according to print order
 mode=n or t
+<<<<<<< HEAD:print_file_format
 type=local or network
+=======
+type = local or network
+>>>>>>> 5077672b22ee9aad784a1712fc1e813e172bf22f:print_file_format.txt
 file=/path/to/file
 number="number of times to print"
 start_time="start time of print"

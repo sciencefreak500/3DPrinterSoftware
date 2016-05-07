@@ -85,21 +85,27 @@ class Application(Frame):
 
     def LoopDir(self):
         PrintList = CheckDirChanges()
+        FinalQueueList = []
         if PrintList != self.CompareList:
-            if len(PrintList) > len(self.CompareList):
-                print "adding to list"
-                temp = list(set(PrintList) - set(self.CompareList))
-                for i in temp:
-                    self.QueueList.insert(END,i)
-            elif len(PrintList) < len(self.CompareList):
-                temp = list(set(self.CompareList) - set(PrintList))
-                for i in temp:
-                    print "select i in queue"
-                    print "delete "
+            try:
+                if len(PrintList) > len(self.CompareList):  ##something needs to be added
+                    print "adding to list"
+                    temp = list(set(PrintList) - set(self.CompareList))
+                    for i in temp:
+                        self.QueueList.insert(END,i)
+                elif len(PrintList) < len(self.CompareList):   ##something needs to be removed
+                    temp = list(set(self.CompareList) - set(PrintList))
+                    for i in temp:
+                        print "select i in queue"
+                        print "delete "
+                        
+                else:   ##order of queue needs to change
+                    print "just different queue order"
                     
-            else:
-                print "just different queue order"
+            except:
+                print "something wrong"
         self.CompareList = PrintList
+        
         self.after(1000, self.LoopDir)
 
     def createWidgets(self):
@@ -140,6 +146,9 @@ try:
     root.destroy()
 except:
     print "closed"
+
+
+
 
 
 
