@@ -78,9 +78,11 @@ class Application(Frame):
         root.wm_state('withdrawn')
         self.after(5000,self.MakeNormal)
 
-    def SendToFolder(self):
-        filename = filedialog.askopenfilename()
-        shutil.copy(filename,DirLocation)
+    def SendToPrinter(self):
+	printer=/path/to/printer #this will have to grab the path from the settings that the User enters to connect to the printer
+        File=str(DirLoc+checkdir.Queue1)
+        shutil.move(DirLoc+File, printer) #need to find out how printer processes files to send them over correctly
+	os.remove(DirLoc+File)
 
     def MoveUp(self):
         l = self.QueueList
@@ -149,7 +151,7 @@ class Application(Frame):
 
         self.background = Button(self)
         self.background["text"] = "Send to Printer",
-        self.background["command"] = self.SendToFolder
+        self.background["command"] = self.SendToPrinter
         self.background.grid(row=0,column=1, sticky = E)
 
         self.background = Button(self)
