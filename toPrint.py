@@ -5,18 +5,19 @@ import shutil
 import os
 import time
 import checkdir
+import pickle
 
 printButton=0 #will be changed to one when user clicks print button
-File=File
-directoryPath=/path/to/directory
+with open('setup.inf') as n
+	pickle.dump([DirLoc],n)
+File=str(DirLoc+checkdir.Queue1)
 printer=/path/to/printer
 while 1=1:
 	if printButton=1:
-		checkdir...  #check staging directory for files
-		while checkdir #retuturns files to print:
-			shutil.move(directoryPath+File, printer) #need to find out how printer processes files to send them over correctly
-			os.remove(directoryPath+File)
+		while File!=str(DirLoc) #retuturns files to print:
+			shutil.move(File, printer) #need to find out how printer processes files to send them over correctly
+			os.remove(File)
 		
 	else:
-		time.sleep(1) #needs to be changed to trigger
+		time.sleep(1) 
 
