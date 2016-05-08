@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+# -*- coding: utf-8 -*-
 ####### IMPORTS #######
 
 import os
@@ -70,6 +71,9 @@ def CheckDirChanges(): #check directory is empty, else print files/folders liste
 
 InitializeProgram()
 
+
+        
+
 class Application(Frame):
     
     def MakeNormal(self):
@@ -81,6 +85,7 @@ class Application(Frame):
         self.after(5000,self.MakeNormal)
 
     def SendToPrinter(self):
+<<<<<<< HEAD
 	Printer_re = re.compile("Bus\s+(?P<bus>\d+)\s+Device\s+(?P<device>\d+).+ID\s(?P<id>\w+:\w+)\s(?P<tag>.+)$", re.I) #start of query to find where the printer is connected to the computer
 	df = subprocess.check_output("lsusb", shell=True)
 	Printer = []
@@ -94,6 +99,14 @@ class Application(Frame):
         File=str(DirLoc+checkdir.Queue1)
         shutil.move(DirLoc+File, Printer) #need to find out how printer processes files to send them over correctly
 	os.remove(DirLoc+File)
+=======
+        filename = filedialog.askopenfilename()
+        try:
+            shutil.copy(filename,DirLocation)
+        except:
+            print "User closed before selecting"
+
+>>>>>>> 6dcd4e4d741c503dd4722eaa9f38c7e7c063ee41
 
     def MoveUp(self):
         l = self.QueueList
@@ -160,20 +173,24 @@ class Application(Frame):
         self.background["command"] = self.PushBackground
         self.background.grid(row=0,column=0, sticky = W)
 
-        self.background = Button(self)
-        self.background["text"] = "Send to Printer",
-        self.background["command"] = self.SendToPrinter
-        self.background.grid(row=0,column=1, sticky = E)
+        self.sendqueue = Button(self)
+        self.sendqueue["text"] = "Send to Printer Queue",
+        self.sendqueue["command"] = self.SendToPrinter
+        self.sendqueue.grid(row=0,column=1, sticky = E)
 
-        self.background = Button(self)
-        self.background["text"] = "Move Up Queue",
-        self.background["command"] = self.MoveUp
-        self.background.grid(row=2,column=1, sticky = E)
+        self.updownframe = Frame(self, height = 50, width = 50)
+        self.updownframe.grid(row=1,column=1, sticky = E)
 
-        self.background = Button(self)
-        self.background["text"] = "Move Down Queue",
-        self.background["command"] = self.MoveDown
-        self.background.grid(row=2,column=2, sticky = E)
+        
+        self.moveup = Button(self.updownframe)
+        self.moveup["text"] = "▲",
+        self.moveup["command"] = self.MoveUp
+        self.moveup.grid(row=1,column=1, sticky = E)
+
+        self.movedown = Button(self.updownframe)
+        self.movedown["text"] = "▼",
+        self.movedown["command"] = self.MoveDown
+        self.movedown.grid(row=2,column=1, sticky = E)
 
         self.QueueList = Listbox(self)
         self.QueueList.grid(row=1,column=0, sticky = S, columnspan = 2, pady = 10)
