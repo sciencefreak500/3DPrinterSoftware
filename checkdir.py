@@ -6,6 +6,8 @@ import pickle
 import tkFileDialog as filedialog
 from Tkinter import *
 import shutil
+import re
+import subprocess
 
 ####### SCRIPT VARIABLES #######
 
@@ -79,9 +81,18 @@ class Application(Frame):
         self.after(5000,self.MakeNormal)
 
     def SendToPrinter(self):
-	printer=/path/to/printer #this will have to grab the path from the settings that the User enters to connect to the printer
+	Printer_re = re.compile("Bus\s+(?P<bus>\d+)\s+Device\s+(?P<device>\d+).+ID\s(?P<id>\w+:\w+)\s(?P<tag>.+)$", re.I) #start of query to find where the printer is connected to the computer
+	df = subprocess.check_output("lsusb", shell=True)
+	Printer = []
+	for i in df.split('\n'):
+   		if i:
+       			info = Printer_re.match(i)
+       			if info:
+            			Pinfo = info.groupdict()
+           			Pinfo['device'] = '/dev/bus/usb/%s/%s' % (Pinfo.pop('bus'), Pinfo.pop('device'))
+            			Printer.append(Pinfo)	#End of query
         File=str(DirLoc+checkdir.Queue1)
-        shutil.move(DirLoc+File, printer) #need to find out how printer processes files to send them over correctly
+        shutil.move(DirLoc+File, Printer) #need to find out how printer processes files to send them over correctly
 	os.remove(DirLoc+File)
 
     def MoveUp(self):
