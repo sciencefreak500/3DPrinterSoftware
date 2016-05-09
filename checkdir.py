@@ -85,6 +85,8 @@ class Application(Frame):
         self.after(5000,self.MakeNormal)
 
     def SendToPrinter(self):
+        print "functionality"
+        '''
 <<<<<<< HEAD
 	Printer_re = re.compile("Bus\s+(?P<bus>\d+)\s+Device\s+(?P<device>\d+).+ID\s(?P<id>\w+:\w+)\s(?P<tag>.+)$", re.I) #start of query to find where the printer is connected to the computer
 	df = subprocess.check_output("lsusb", shell=True)
@@ -107,7 +109,7 @@ class Application(Frame):
             print "User closed before selecting"
 
 >>>>>>> 6dcd4e4d741c503dd4722eaa9f38c7e7c063ee41
-
+        '''
     def MoveUp(self):
         l = self.QueueList
         try:    
