@@ -1,6 +1,5 @@
 #! /usr/bin/env python
 #This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
-# -*- coding: utf-8 -*-
 ####### IMPORTS #######
 
 import os
@@ -70,6 +69,7 @@ def GetUSB():
     device_re = re.compile("Bus\s+(?P<bus>\d+)\s+Device\s+(?P<device>\d+).+ID\s(?P<id>\w+:\w+)\s(?P<tag>.+)$", re.I)
     if os.name == 'nt':
         #df = subprocess.check_output("lsusb", shell=True) windows equivelent
+	pass
     else:
         df = subprocess.check_output("lsusb", shell=True)
     devices = []
@@ -92,6 +92,11 @@ InitializeProgram()
         
 
 class Application(Frame):
+    def ConnectToPrinter(self):
+		print"functionality"
+
+    def AddToQueue(self):
+		print"functionality"
     
     def MakeNormal(self):
         root.wm_state('normal')
@@ -105,16 +110,6 @@ class Application(Frame):
         print "functionality"
         '''
 <<<<<<< HEAD
-	Printer_re = re.compile("Bus\s+(?P<bus>\d+)\s+Device\s+(?P<device>\d+).+ID\s(?P<id>\w+:\w+)\s(?P<tag>.+)$", re.I) #start of query to find where the printer is connected to the computer
-	df = subprocess.check_output("lsusb", shell=True)
-	Printer = []
-	for i in df.split('\n'):
-   		if i:
-       			info = Printer_re.match(i)
-       			if info:
-            			Pinfo = info.groupdict()
-           			Pinfo['device'] = '/dev/bus/usb/%s/%s' % (Pinfo.pop('bus'), Pinfo.pop('device'))
-            			Printer.append(Pinfo)	#End of query
         File=str(DirLoc+checkdir.Queue1)
         shutil.move(DirLoc+File, Printer) #need to find out how printer processes files to send them over correctly
 	os.remove(DirLoc+File)
@@ -193,21 +188,30 @@ class Application(Frame):
         self.background.grid(row=0,column=0, sticky = W)
 
         self.sendqueue = Button(self)
-        self.sendqueue["text"] = "Send to Printer Queue",
+        self.sendqueue["text"] = "Print Queue",
         self.sendqueue["command"] = self.SendToPrinter
         self.sendqueue.grid(row=0,column=1, sticky = E)
 
         self.updownframe = Frame(self, height = 50, width = 50)
         self.updownframe.grid(row=1,column=1, sticky = E)
 
-        
+        self.sendqueue = Button(self)
+        self.sendqueue["text"] = "Add to Queue",
+        self.sendqueue["command"] = self.AddToQueue
+        self.sendqueue.grid(row=0,column=2, sticky = E)        
+
+        self.sendqueue = Button(self)
+        self.sendqueue["text"] = "Connect Printer",
+        self.sendqueue["command"] = self.ConnectToPrinter
+        self.sendqueue.grid(row=1,column=2, sticky = E)
+
         self.moveup = Button(self.updownframe)
-        self.moveup["text"] = "▲",
+        self.moveup["text"] = u'\u25b2'
         self.moveup["command"] = self.MoveUp
         self.moveup.grid(row=1,column=1, sticky = E)
 
         self.movedown = Button(self.updownframe)
-        self.movedown["text"] = "▼",
+        self.movedown["text"] = u'\u25bc'
         self.movedown["command"] = self.MoveDown
         self.movedown.grid(row=2,column=1, sticky = E)
 
