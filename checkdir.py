@@ -9,6 +9,7 @@ from Tkinter import *
 import shutil
 import re
 import subprocess
+import PrinterRainbowTable
 
 ####### SCRIPT VARIABLES #######
 
@@ -69,7 +70,7 @@ def GetUSB():
     device_re = re.compile("Bus\s+(?P<bus>\d+)\s+Device\s+(?P<device>\d+).+ID\s(?P<id>\w+:\w+)\s(?P<tag>.+)$", re.I)
     if os.name == 'nt':
         #df = subprocess.check_output("lsusb", shell=True) windows equivelent
-	pass
+	pass #pass is a place holder until bug is fixed
     else:
         df = subprocess.check_output("lsusb", shell=True)
     devices = []
@@ -80,7 +81,15 @@ def GetUSB():
                 dinfo = info.groupdict()
                 dinfo['device'] = '/dev/bus/usb/%s/%s' % (dinfo.pop('bus'), dinfo.pop('device'))
                 devices.append(dinfo)
-    print devices
+	m=int(2) #this value needs to be user inputed
+	n=int(0)
+	ID=PrinterRainbowTable.Device()
+    while int(len(devices)-1)>=n:
+		if devices[n]==ID[m]:
+			print "Printer found, functionality."
+		if int(len(devices)-1)==n and devices[n]!=ID[m]:
+			print "Printer not found."
+		n+=1
 
 
 ####### MAIN SCRIPT #######
@@ -94,9 +103,10 @@ InitializeProgram()
 class Application(Frame):
     def ConnectToPrinter(self):
 		print"functionality"
+		GetUSB()
 
     def AddToQueue(self):
-		print"functionality"
+                File = filedialog.askdirectory(initialdir='.')
     
     def MakeNormal(self):
         root.wm_state('normal')
@@ -229,8 +239,6 @@ class Application(Frame):
 
         
 
-GetUSB()
-
 root = Tk()
 entry = Entry()
 def handle(event):
@@ -243,9 +251,4 @@ try:
     root.destroy()
 except:
     print "closed"
-
-
-
-
-
 

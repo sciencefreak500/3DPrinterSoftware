@@ -1,9 +1,22 @@
 #!/usr/bin/python
-import sys
-import usb.core
-# find USB devices
-dev = usb.core.find(find_all=True)
-# loop through devices, printing vendor and product ids in decimal and hex
-for cfg in dev:
-  sys.stdout.write('Decimal VendorID=' + str(cfg.idVendor) + ' & ProductID=' + str(cfg.idProduct) + '\n')
-  sys.stdout.write('Hexadecimal VendorID=' + hex(cfg.idVendor) + ' & ProductID=' + hex(cfg.idProduct) + '\n\n')
+#adding menu pop up for printer connect and adding files to queue
+
+from Tkinter import *
+
+top = Tk()
+
+mb=  Menubutton ( top, text="condiments", relief=RAISED )
+mb.grid()
+mb.menu  =  Menu ( mb, tearoff = 0 )
+mb["menu"]  =  mb.menu
+    
+mayoVar  = IntVar()
+ketchVar = IntVar()
+
+mb.menu.add_checkbutton ( label="mayo",
+                          variable=mayoVar )
+mb.menu.add_checkbutton ( label="ketchup",
+                          variable=ketchVar )
+
+mb.pack()
+top.mainloop()
