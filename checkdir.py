@@ -81,28 +81,31 @@ def GetUSB():
                 dinfo = info.groupdict()
                 dinfo['device'] = '/dev/bus/usb/%s/%s' % (dinfo.pop('bus'), dinfo.pop('device'))
                 devices.append(dinfo)
-	m=int(2) #this value needs to be user inputed
-	n=int(0)
-	ID=PrinterRainbowTable.Device()
+    m=int(2) #this value needs to be user inputed
+    n=int(0)
+    ID=PrinterRainbowTable.Device()
+    found=int(0)
     while int(len(devices)-1)>=n:
-		if devices[n]==ID[m]:
+		dID=devices[n]
+		if dID['id']==ID[m]:
 			print "Printer found, functionality."
-		if int(len(devices)-1)==n and devices[n]!=ID[m]:
+			found=int(1)
+			break
+		if int(len(devices)-1)==n and found!=int(1):
 			print "Printer not found."
 		n+=1
-
-
+    print dID['device'] #this is the path to the printer
+    #with open(dID['device'],"rb") as f:
+    #    data=f.read()
+    #    printerbinary=data.encode('ascii')
+    #print printerbinary  #CDH How do you work with pure binary data in pyhton?
 ####### MAIN SCRIPT #######
 
-
 InitializeProgram()
-
-
-        
+   
 
 class Application(Frame):
     def ConnectToPrinter(self):
-		print"functionality"
 		GetUSB()
 
     def AddToQueue(self):

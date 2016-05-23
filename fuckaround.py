@@ -3,20 +3,22 @@
 
 from Tkinter import *
 
-top = Tk()
+master = Tk()
 
-mb=  Menubutton ( top, text="condiments", relief=RAISED )
-mb.grid()
-mb.menu  =  Menu ( mb, tearoff = 0 )
-mb["menu"]  =  mb.menu
-    
-mayoVar  = IntVar()
-ketchVar = IntVar()
+var = StringVar(master)
+var.set("one") # initial value
 
-mb.menu.add_checkbutton ( label="mayo",
-                          variable=mayoVar )
-mb.menu.add_checkbutton ( label="ketchup",
-                          variable=ketchVar )
+option = OptionMenu(master, var, "one", "two", "three", "four")
+option.pack()
 
-mb.pack()
-top.mainloop()
+#
+# test stuff
+
+def ok():
+    print "value is", var.get()
+    master.quit()
+
+button = Button(master, text="OK", command=ok)
+button.pack()
+
+mainloop()
