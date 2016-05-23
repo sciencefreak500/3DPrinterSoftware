@@ -3,7 +3,7 @@
 #Lookup table for 3D printer device ID's
 
 def Printer():	#return command doesn't work unless in a function
-	PrinterName=["Ultimaker2","Bukito","Red Wheel Mouse"] #Places in Array correspond with each other
+	PrinterName=["Ultimaker2","Bukito","Red Wheel Mouse"] #Places in Arrays correspond with each other
 	return PrinterName
 def	Device(): 
 	ID=["2341:0042","16c0:0483","04b3:310b"]

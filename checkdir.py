@@ -93,6 +93,7 @@ def GetUSB():
 			break
 		if int(len(devices)-1)==n and found!=int(1):
 			print "Printer not found."
+			dID['device']="null"
 		n+=1
     print dID['device'] #this is the path to the printer
     #with open(dID['device'],"rb") as f:
