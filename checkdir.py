@@ -88,18 +88,13 @@ def GetUSB():
     while int(len(devices)-1)>=n:
 		dID=devices[n]
 		if dID['id']==ID[m]:
-			print "Printer found, functionality."
 			found=int(1)
 			break
 		if int(len(devices)-1)==n and found!=int(1):
-			print "Printer not found."
 			dID['device']="null"
 		n+=1
-    print dID['device'] #this is the path to the printer
-    #with open(dID['device'],"rb") as f:
-    #    data=f.read()
-    #    printerbinary=data.encode('ascii')
-    #print printerbinary  #CDH How do you work with pure binary data in pyhton?
+    return dID['device'] #this is the path to the printer
+    
 ####### MAIN SCRIPT #######
 
 InitializeProgram()
@@ -107,7 +102,16 @@ InitializeProgram()
 
 class Application(Frame):
     def ConnectToPrinter(self):
-		GetUSB()
+	port=GetUSB()
+	global port
+	if port==str("null"): #Weather the printer is connected or not needs to be displayed in the GUI
+		print "Printer not found."
+	else:
+		print "Printer found."
+	#with open(port,"rb") as f:
+    	#	data=f.read()
+    	#	printerbinary=data.encode('ascii')
+    	#print printerbinary  #CDH How do you work with pure binary data in pyhton?
 
     def AddToQueue(self):
                 File = filedialog.askdirectory(initialdir='.')
@@ -115,7 +119,7 @@ class Application(Frame):
     def MakeNormal(self):
         root.wm_state('normal')
         
-    def PushBackground(self):
+    def PushBackground(self): #Pushes to far into background, 
         print "minimizing"
         root.wm_state('withdrawn')
         self.after(5000,self.MakeNormal)
@@ -125,7 +129,7 @@ class Application(Frame):
         '''
 <<<<<<< HEAD
         File=str(DirLoc+checkdir.Queue1)
-        shutil.move(DirLoc+File, Printer) #need to find out how printer processes files to send them over correctly
+        shutil.move(DirLoc+File, port) #printer understands files as gcode, need to make sure file is gcode.
 	os.remove(DirLoc+File)
 =======
         filename = filedialog.askopenfilename()

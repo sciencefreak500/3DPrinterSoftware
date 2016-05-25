@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#! /usr/bin/env python
 #adding menu pop up for printer connect and adding files to queue
 
 from Tkinter import *
@@ -6,11 +6,11 @@ from Tkinter import *
 master = Tk()
 
 var = StringVar(master)
-var.set("one") # initial value
+var.set("Bukito") # initial value
 
-option = OptionMenu(master, var, "one", "two", "three", "four")
+option = OptionMenu(master, var, "Bukito", "Ultimaker2", "Red Wheel Mouse","other")
 option.pack()
-
+#set1.diffrence(set2) #start of in case printer doesn't appear in list function
 #
 # test stuff
 
@@ -21,4 +21,4 @@ def ok():
 button = Button(master, text="OK", command=ok)
 button.pack()
 
-mainloop()
+master.mainloop()

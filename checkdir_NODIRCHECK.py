@@ -60,7 +60,19 @@ def GetUSB():
                 dinfo = info.groupdict()
                 dinfo['device'] = '/dev/bus/usb/%s/%s' % (dinfo.pop('bus'), dinfo.pop('device'))
                 devices.append(dinfo)
-    print devices
+    m=int(2) #this value needs to be user inputed
+    n=int(0)
+    ID=PrinterRainbowTable.Device()
+    found=int(0)
+    while int(len(devices)-1)>=n:
+		dID=devices[n]
+		if dID['id']==ID[m]:
+			found=int(1)
+			break
+		if int(len(devices)-1)==n and found!=int(1):
+			dID['device']="null"
+		n+=1
+    return dID['device'] #this is the path to the printer
 
 
 ####### MAIN SCRIPT #######
@@ -73,7 +85,16 @@ InitializeProgram()
 
 class Application(Frame):
     def ConnectToPrinter(self):
-        print"functionality"
+        port=GetUSB()
+	global port
+	if port==str("null"): #Weather the printer is connected or not needs to be displayed in the GUI
+		print "Printer not found."
+	else:
+		print "Printer found."
+	#with open(port,"rb") as f:
+    	#	data=f.read()
+    	#	printerbinary=data.encode('ascii')
+    	#print printerbinary  #CDH How do you work with pure binary data in pyhton?
 
     def AddToQueue(self):
         filename = filedialog.askopenfilename()
