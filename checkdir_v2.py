@@ -9,6 +9,7 @@ from Tkinter import *
 import shutil
 import re
 import subprocess
+import PrinterRainbowTable
 
 ####### SCRIPT VARIABLES #######
 
@@ -85,8 +86,8 @@ InitializeProgram()
 
 class Application(Frame):
     def ConnectToPrinter(self):
-        port=GetUSB()
 	global port
+	port=GetUSB()
 	if port==str("null"): #Weather the printer is connected or not needs to be displayed in the GUI
 		print "Printer not found."
 	else:
@@ -148,7 +149,7 @@ class Application(Frame):
 
     def LoopDir(self):
         global CurrentQueue
-        PrintList = tuple(CurrentQueue)
+        PrintList = CurrentQueue
 
         if PrintList != self.CompareList:
             try:
