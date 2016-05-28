@@ -22,7 +22,7 @@ def SetFirstRun():  #refresh setup.inf as if first run
 	CurQueue = []
 	ArchQueue = []
 	with open('setup.inf','w') as f:
-		pickle.dump([CurQueue, ArchQueue], str(f)")
+		pickle.dump([CurQueue, ArchQueue], str(f))
 	InitializeProgram()
 
 
