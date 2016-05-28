@@ -1,11 +1,10 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 #This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
 ####### IMPORTS #######
 
 import os
 import pickle
-import tkFileDialog as filedialog
-from Tkinter import *
+from tkinter import *
 import shutil
 import re
 import subprocess
@@ -19,6 +18,14 @@ ArchivedQueue = []
 
 ####### FUNCTIONS #######
 
+def SetFirstRun():  #refresh setup.inf as if first run
+	CurQueue = []
+	ArchQueue = []
+	with open('setup.inf','w') as f:
+		pickle.dump([CurQueue, ArchQueue], str(f))
+	InitializeProgram()
+
+
 def SaveState():
 	global CurrentQueue
 	global ArchivedQueue
@@ -27,18 +34,25 @@ def SaveState():
 
 
 def InitializeProgram():  #If first time running, set location, else pull from setup.inf
-	global DirLoc;
+	global DirLocation;
 	try:
 		with open('setup.inf') as f:
-			DirLoc = pickle.load(f)
-                        global Dirloc
-			print (Dirloc)
-	except:
+			FirstRun, DirLoc = pickle.load(f)
+		if FirstRun == True:
 			root = Tk()
-			DirLoc = filedialog.askdirectory(initialdir='.')
+			DirLocation = filedialog.askdirectory(initialdir='.')
 			root.destroy()
+			FirstRun = False
+			DirLoc = DirLocation
 			with open('setup.inf','w') as f:
-				pickle.dump([DirLoc], f)
+				pickle.dump([FirstRun, DirLoc], f)
+		else:
+			DirLocation = DirLoc
+			print (DirLoc)
+	except:
+		file = open('setup.inf','w')
+		file.close()
+		SetFirstRun()   
 
 def GetUSB():
 	device_re = re.compile("Bus\s+(?P<bus>\d+)\s+Device\s+(?P<device>\d+).+ID\s(?P<id>\w+:\w+)\s(?P<tag>.+)$", re.I)
@@ -112,7 +126,7 @@ class Application(Frame):
 		filename=filepath[n:len(filepath)]
 		self.QueueList.insert(END,filename)
 		print (filename)
-		with open(os.path.join(DirLoc,filename), "w") as file1:
+		with open(os.path.join('/home/netpositive/workspace/3D_automation/Software/gitHub/TestDir',filename), "w") as file1: #CDH Needs to be made into a relative file path
 			toFile = raw_input("Write what you want into the field:") #CDH This is where user puts in how they want their file printed Tk()
 			file1.write(toFile)
 		try:
@@ -169,23 +183,23 @@ class Application(Frame):
 	def LoopDir(self):
 		global CurrentQueue
 		printList = CurrentQueue
-		if printList != self.CompareList:
+		if PrintList != self.CompareList:
 			try:
-				if len(printList) > len(self.CompareList):  ##something needs to be added
-					temp = list(set(printList) - set(self.CompareList))
+				if len(PrintList) > len(self.CompareList):  ##something needs to be added
+					temp = list(set(PrintList) - set(self.CompareList))
 					for i in temp:
 						self.QueueList.insert(END,i)
 
-				elif len(printList) < len(self.CompareList):   ##something needs to be removed
-					temp = list(set(self.CompareList) - set(printList))
+				elif len(PrintList) < len(self.CompareList):   ##something needs to be removed
+					temp = list(set(self.CompareList) - set(PrintList))
 					for i in temp:
 						gone = self.CompareList.index(i)
 						self.QueueList.delete(gone)
-				elif set(printList) == set(self.CompareList):
+				elif set(PrintList) == set(self.CompareList):
 					pass
 				else:   ##Something bad happened, reset list
 					self.QueueList.delete(0, END)
-					for i in printList:
+					for i in PrintList:
 						self.QueueList.insert(END,i)
 			except:
 				print ("something wrong")
