@@ -3,7 +3,6 @@
 ####### IMPORTS #######
 
 import os
-import pickle
 import tkFileDialog as filedialog
 from Tkinter import *
 import shutil

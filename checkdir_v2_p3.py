@@ -5,55 +5,91 @@
 import os
 import pickle
 from tkinter import *
-import shutil
+from tkinter import filedialog
 import re
 import subprocess
-import PrinterRainbowTable
 import sys
+import importlib
+import PrinterRainbowTable
+import PrinterQueue
 
-####### SCRIPT VARIABLES #######
+####### FUNCTIONS #######	
 
-CurrentQueue = []
-ArchivedQueue = []
-
-####### FUNCTIONS #######
-
-def SetFirstRun():  #refresh setup.inf as if first run
-	CurQueue = []
-	ArchQueue = []
-	with open('setup.inf','w') as f:
-		pickle.dump([CurQueue, ArchQueue], str(f))
-	InitializeProgram()
-
-
-def SaveState():
-	global CurrentQueue
-	global ArchivedQueue
-	with open('setup.inf','w') as f:
-		pickle.dump([CurrentQueue, ArchivedQueue], f)
-
-
-def InitializeProgram():  #If first time running, set location, else pull from setup.inf
-	global DirLocation;
-	try:
-		with open('setup.inf') as f:
-			FirstRun, DirLoc = pickle.load(f)
-		if FirstRun == True:
-			root = Tk()
-			DirLocation = filedialog.askdirectory(initialdir='.')
-			root.destroy()
-			FirstRun = False
-			DirLoc = DirLocation
-			with open('setup.inf','w') as f:
-				pickle.dump([FirstRun, DirLoc], f)
+def WriteToQueue():
+	importlib.reload(PrinterQueue)
+	filePath = filedialog.askopenfilename()
+	currentFilePath=PrinterQueue.CurrentFilePath()
+	currentFilePath.append(filePath)
+	n=int(0)
+	revfilepath=filePath[::-1]
+	while n<int(len(filePath)):
+		if str(revfilepath[n])=="/":
+			n=int(len(filePath)-n)
+			break
 		else:
-			DirLocation = DirLoc
-			print (DirLoc)
-	except:
-		file = open('setup.inf','w')
-		file.close()
-		SetFirstRun()   
+			n+=1
+	fileName=filePath[n:len(filePath)]
+	currentFileName=PrinterQueue.CurrentFileName()
+	currentFileName.append(fileName)
+	with open("PrinterQueue.py", "w") as f: 
+		f.write("""#! /usr/bin/env python3
+#This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
 
+def CurrentFileName():
+	currentFileName=""")
+		f.write(str(currentFileName))
+		f.write("""
+	return currentFileName
+def CurrentFilePath():
+	currentFilePath=""")
+		f.write(str(currentFilePath))
+		f.write("""
+	return currentFilePath
+def CurrentPrintNumber():
+	currentPrintNumber=""")
+		f.write(str(currentPrintNumber))
+		f.write("""
+	return currentPrintNumber
+def CurrentPrintType():
+	currentPrintType=""")
+		f.write(str(currentPrintType))
+		f.write("""
+	return currentPrintType
+CurrentFileName()
+CurrentFilePath()
+CurrentPrintNumber()
+CurrentPrintType()""")
+	importlib.reload(PrinterQueue)
+def DeleteFromQueue(index):
+	with open("PrinterQueue.py", "w") as f: 
+		f.write("""#! /usr/bin/env python3
+#This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
+
+def CurrentFileName():
+	currentFileName=""")
+		f.write(str(currentFileName))
+		f.write("""
+	return currentFileName
+def CurrentFilePath():
+	currentFilePath=""")
+		f.write(str(currentFilePath))
+		f.write("""
+	return currentFilePath
+def CurrentPrintNumber():
+	currentPrintNumber=""")
+		f.write(str(currentPrintNumber))
+		f.write("""
+	return currentPrintNumber
+def CurrentPrintType():
+	currentPrintType=""")
+		f.write(str(currentPrintType))
+		f.write("""
+	return currentPrintType
+CurrentFileName()
+CurrentFilePath()
+CurrentPrintNumber()
+CurrentPrintType()""")
+	importlib.reload(PrinterQueue)
 def GetUSB():
 	device_re = re.compile("Bus\s+(?P<bus>\d+)\s+Device\s+(?P<device>\d+).+ID\s(?P<id>\w+:\w+)\s(?P<tag>.+)$", re.I)
 	if os.name == 'nt':
@@ -62,7 +98,7 @@ def GetUSB():
 	else:
 		df = subprocess.check_output("lsusb", shell=True)
 	devices = []
-	for i in df.split('\n'):
+	for i in df.split():
 		if i:
 			info = device_re.match(i)
 			if info:
@@ -72,28 +108,20 @@ def GetUSB():
 	ID=PrinterRainbowTable.Device()
 	DeviceName=PrinterRainbowTable.DeviceName()
 	n=int(0)
-	found=int(1)
-	Printer=[0,1,2,3,4,5,6]
 	while int(len(devices)-1)>=n:
 		dID=devices[n]
 		m=int(0)
 		while int(len(ID)-1)>=m:
 			if dID['id']==ID[m]:
-				Printer[found]=DeviceName[m]
-				found+=1
-				Printer[found]=dID['device'] #CDH needs to be changed to an append
-				found+=1
-			if int(len(devices)-1)==n and int(len(devices)-1)==m and found==int(0):
+				Printer=DeviceName[m]
+				Printer.append(dID['device'])
+			if int(len(devices)-1)==n and int(len(devices)-1)==m :
 				Printer="null"
 			m+=1
 		n+=1
-	Printer[0]=int(found)
 	return Printer #this is the path to the printer
 
 ####### MAIN SCRIPT #######
-
-
-InitializeProgram()
 
 
 class Application(Frame):
@@ -114,40 +142,20 @@ class Application(Frame):
 			#print printerbinary  #CDH How do you work with pure binary data in pyhton?
 
 	def AddToQueue(self):	
-		filepath = filedialog.askopenfilename()
-		n=int(0)
-		revfilepath=filepath[::-1]
-		while n<int(len(filepath)):
-			if str(revfilepath[n])=="/":
-				n=int(len(filepath)-n)
-				break
-			else:
-				n+=1
-		filename=filepath[n:len(filepath)]
-		self.QueueList.insert(END,filename)
-		print (filename)
-		with open(os.path.join('/home/netpositive/workspace/3D_automation/Software/gitHub/TestDir',filename), "w") as file1: #CDH Needs to be made into a relative file path
-			toFile = raw_input("Write what you want into the field:") #CDH This is where user puts in how they want their file printed Tk()
-			file1.write(toFile)
-		try:
-			with open('setup.inf') as f:
-				CurrentQueue, ArchivedQueue = pickle.load(f)
-				print (CurrentQueue, ArchivedQueue)
-		except:
-			file = open('setup.inf','w')
-			file.close()
+		WriteToQueue()
+		fileName=PrinterQueue.CurrentFileName()
+		fileName=fileName[int(len(fileName)-1)]
+		self.QueueList.insert(END,fileName)
+		
 
 	def RemoveFromQueue(self):
 		index = self.QueueList.index(ACTIVE)
+		print(self.QueueList)
+		DeleteFromQueue(index)
 		self.QueueList.delete(index)
 
 	def MakeNormal(self):
 		root.wm_state('normal')
-
-	def PushBackground(self):
-		print ("minimizing")
-		root.wm_state('withdrawn')
-		self.after(5000,self.MakeNormal)
 
 	def SendToPrinter(self):
 		print ("functionality")
@@ -181,8 +189,7 @@ class Application(Frame):
 		l.selection_set(pos+1)
 
 	def LoopDir(self):
-		global CurrentQueue
-		printList = CurrentQueue
+		PrintList =PrinterQueue.CurrentFileName()
 		if PrintList != self.CompareList:
 			try:
 				if len(PrintList) > len(self.CompareList):  ##something needs to be added
@@ -210,10 +217,6 @@ class Application(Frame):
 		self.after(1000, self.LoopDir)
 
 	def createWidgets(self):
-		self.background = Button(self)
-		self.background["text"] = "Push To Background",
-		self.background["command"] = self.PushBackground
-		self.background.grid(row=0,column=0, sticky = W)
 
 		self.printqueue = Button(self)
 		self.printqueue["text"] = "Print Queue",
@@ -236,17 +239,17 @@ class Application(Frame):
 		self.connectprinter = Button(self)
 		self.connectprinter["text"] = "Connect Printer",
 		self.connectprinter["command"] = self.ConnectToPrinter
-		self.connectprinter.grid(row=1,column=2, sticky = E)
+		self.connectprinter.grid(row=0,column=0, sticky = E)
 
 		self.moveup = Button(self.updownframe)
 		self.moveup["text"] = u'\u25b2'
 		self.moveup["command"] = self.MoveUp
-		self.moveup.grid(row=1,column=1, sticky = E)
+		self.moveup.grid(row=1,column=2, sticky = E)
 
 		self.movedown = Button(self.updownframe)
 		self.movedown["text"] = u'\u25bc'
 		self.movedown["command"] = self.MoveDown
-		self.movedown.grid(row=2,column=1, sticky = E)
+		self.movedown.grid(row=2,column=2, sticky = E)
 
 		self.QueueList = Listbox(self)
 		self.QueueList.grid(row=1,column=0, sticky = S, columnspan = 2, pady = 10)
@@ -271,6 +274,5 @@ app.mainloop()
 try:
 	root.destroy()
 except:
-	SaveState()
 	print ("closed")
 
