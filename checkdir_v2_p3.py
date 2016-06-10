@@ -93,49 +93,41 @@ CurrentPrintType()""")
 def GetUSB():
 	device_re = re.compile("Bus\s+(?P<bus>\d+)\s+Device\s+(?P<device>\d+).+ID\s(?P<id>\w+:\w+)\s(?P<tag>.+)$", re.I)
 	if os.name == 'nt':
-		#df = subprocess.check_output("lsusb", shell=True) windows equivelent
+		#df = subprocess.check_output("lsusb", shell=True) needs windows and mac equivelent
 		pass
 	else:
-		df = subprocess.check_output("lsusb", shell=True)
-	devices = []
-	for i in df.split():
-		if i:
-			info = device_re.match(i)
-			if info:
-				dinfo = info.groupdict()
-				dinfo['device'] = '/dev/bus/usb/%s/%s' % (dinfo.pop('bus'), dinfo.pop('device'))
-				devices.append(dinfo) 
+		USB = subprocess.check_output("lsusb", shell=True)
+	USBInfo= []
+	for i in USB.split():
+		USBInfo.append(str(i))
+	print(USBInfo)
+	Port= []
 	ID=PrinterRainbowTable.Device()
 	DeviceName=PrinterRainbowTable.DeviceName()
 	n=int(0)
-	while int(len(devices)-1)>=n:
-		dID=devices[n]
-		m=int(0)
+	m=int(0)
+	while int(len(USBInfo)-1)>=n:
 		while int(len(ID)-1)>=m:
-			if dID['id']==ID[m]:
-				Printer=DeviceName[m]
-				Printer.append(dID['device'])
-			if int(len(devices)-1)==n and int(len(devices)-1)==m :
-				Printer="null"
+			if USBInfo[n]==ID[m]: #needs to be formatted correctly
+				bus=USBInfo[int(n+1)]
+				device=USBInfo[int(n+3)]
+				Port.append(str("/dev/bus/usb/"+bus[2:5]+"/"+device[2:5]))
 			m+=1
-		n+=1
-	return Printer #this is the path to the printer
+		n+=1	
+	return Port #this is the path to the printer
 
 ####### MAIN SCRIPT #######
 
 
 class Application(Frame):
 	def ConnectToPrinter(self):
-		port=GetUSB()
-		found=port[0]
-		print (port)
-		if port==str("null"): #Weather the printer is connected or not needs to be displayed in the GUI
+		Port=GetUSB()
+		found=len(Port)
+		print (Port)
+		if Port== []: #Weather the printer is connected or not needs to be displayed in the GUI
 			print ("No printer was found.")
 		else:
-			n=int(1)
-			while n<found:
-				print (port[n],"Printer found.")
-				n+=2
+			print (Port,"Printer found.")
 		#with open(port,"rb") as f:
 			#	data=f.read()
 			#	printerbinary=data.encode('ascii')
