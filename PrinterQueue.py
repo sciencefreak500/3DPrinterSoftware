@@ -13,7 +13,3 @@ def CurrentPrintNumber():
 def CurrentPrintType():
 	currentPrintType=[]
 	return currentPrintType
-CurrentFileName()
-CurrentFilePath()
-CurrentPrintNumber()
-CurrentPrintType()

@@ -2,23 +2,34 @@
 #This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
 ####### IMPORTS #######
 
-import os
-import pickle
 from tkinter import *
 from tkinter import filedialog
-import re
 import subprocess
 import sys
 import importlib
+import Setup
 import PrinterRainbowTable
 import PrinterQueue
 
+####### SETUP ######
+with open("Setup.py", "w") as f:
+	f.write("""#! /usr/bin/env python3
+#This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
+
+def N():
+	n="0"
+	return n""")
+importlib.reload(Setup)
 ####### FUNCTIONS #######	
 
 def WriteToQueue():
+	print("Pop up menu for user to enter print settings")
 	importlib.reload(PrinterQueue)
-	filePath = filedialog.askopenfilename()
+	currentFileName=PrinterQueue.CurrentFileName()
 	currentFilePath=PrinterQueue.CurrentFilePath()
+	currentPrintNumber=PrinterQueue.CurrentPrintNumber()
+	currentPrintType=PrinterQueue.CurrentPrintType()
+	filePath = filedialog.askopenfilename()
 	currentFilePath.append(filePath)
 	n=int(0)
 	revfilepath=filePath[::-1]
@@ -29,7 +40,6 @@ def WriteToQueue():
 		else:
 			n+=1
 	fileName=filePath[n:len(filePath)]
-	currentFileName=PrinterQueue.CurrentFileName()
 	currentFileName.append(fileName)
 	with open("PrinterQueue.py", "w") as f: 
 		f.write("""#! /usr/bin/env python3
@@ -55,12 +65,20 @@ def CurrentPrintType():
 		f.write(str(currentPrintType))
 		f.write("""
 	return currentPrintType
-CurrentFileName()
-CurrentFilePath()
-CurrentPrintNumber()
-CurrentPrintType()""")
+""")
 	importlib.reload(PrinterQueue)
-def DeleteFromQueue(index):
+
+def DeleteFromQueue(fileName):
+	importlib.reload(PrinterQueue)
+	currentFileName=PrinterQueue.CurrentFileName()
+	currentFilePath=PrinterQueue.CurrentFilePath()
+	currentPrintNumber=PrinterQueue.CurrentPrintNumber()
+	currentPrintType=PrinterQueue.CurrentPrintType()
+	index=currentFileName.index(fileName)
+	currentFileName.pop(index)
+	currentFilePath.pop(index)
+	#currentFilePrintNumber.pop(index)
+	#currentFilePrintType.pop(index)
 	with open("PrinterQueue.py", "w") as f: 
 		f.write("""#! /usr/bin/env python3
 #This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
@@ -85,53 +103,89 @@ def CurrentPrintType():
 		f.write(str(currentPrintType))
 		f.write("""
 	return currentPrintType
-CurrentFileName()
-CurrentFilePath()
-CurrentPrintNumber()
-CurrentPrintType()""")
+""")
 	importlib.reload(PrinterQueue)
+
 def GetUSB():
-	device_re = re.compile("Bus\s+(?P<bus>\d+)\s+Device\s+(?P<device>\d+).+ID\s(?P<id>\w+:\w+)\s(?P<tag>.+)$", re.I)
-	if os.name == 'nt':
-		#df = subprocess.check_output("lsusb", shell=True) needs windows and mac equivelent
+	if sys.platform == 'win32':
+		#df = subprocess.check_output("lsusb", shell=True) needs windows equivelent
+		pass
+	elif sys.platform == 'darwin': #df = subprocess.check_output("lsusb", shell=True) needs mac equivelent
 		pass
 	else:
 		USB = subprocess.check_output("lsusb", shell=True)
 	USBInfo= []
 	for i in USB.split():
 		USBInfo.append(str(i))
-	print(USBInfo)
-	Port= []
+	Ports= []
+	Names= []
 	ID=PrinterRainbowTable.Device()
 	DeviceName=PrinterRainbowTable.DeviceName()
 	n=int(0)
-	m=int(0)
 	while int(len(USBInfo)-1)>=n:
+		m=int(0)
 		while int(len(ID)-1)>=m:
-			if USBInfo[n]==ID[m]: #needs to be formatted correctly
-				bus=USBInfo[int(n+1)]
-				device=USBInfo[int(n+3)]
-				Port.append(str("/dev/bus/usb/"+bus[2:5]+"/"+device[2:5]))
+			if USBInfo[n]==ID[m]: 
+				bus=USBInfo[int(n-4)]
+				device=USBInfo[int(n-2)]
+				Path=str("/dev/bus/usb/"+bus[2:5]+"/"+device[2:5])
+				Ports.append(Path)
+				Names.append(DeviceName[m])
 			m+=1
-		n+=1	
-	return Port #this is the path to the printer
-
+		n+=1
+	PortsnNames=[Ports,Names]
+	return PortsnNames #this is the path to the printer
 ####### MAIN SCRIPT #######
 
 
 class Application(Frame):
 	def ConnectToPrinter(self):
-		Port=GetUSB()
-		found=len(Port)
-		print (Port)
-		if Port== []: #Weather the printer is connected or not needs to be displayed in the GUI
-			print ("No printer was found.")
+		n=Setup.N()
+		if n=="0":
+			PortsnNames=GetUSB()
+			Ports=PortsnNames[0]
+			Names=PortsnNames[1]
+			if Ports== []: #Weather the printer is connected or not needs to be displayed in the GUI
+				self.connectPrinterLabel.set("No Printer was Found")
+			elif len(Ports)==1:
+				with open("Setup.py", "w") as f:
+					f.write("""#! /usr/bin/env python3
+#This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
+
+def N():
+	n="1"
+	return n""")
+				importlib.reload(Setup)
+				self.connectPrinterText.set("Disconnect Printer")
+				self.connectPrinterLabel.set("Connected to "+str(Names))
+			else:
+				with open("Setup.py", "w") as f:
+					f.write("""#! /usr/bin/env python3
+#This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
+
+def N():
+	n="1"
+	return n""")
+				importlib.reload(Setup)
+				self.connectPrinterText.set("Disconnect Printer")
+				Name="GUI needs to be created to select which printer to connect to in case of multiple printers found."	#GUI needs to be created to select which printer to connect to in case of multiple printers found.
+				self.connectPrinterLabel.set("Connected to "+str(Name))
+			#with open(port,"rb") as f:
+				#	data=f.read()
+				#	printerbinary=data.encode('ascii')
+				#print printerbinary  #CDH How do you work with pure binary data in pyhton?
 		else:
-			print (Port,"Printer found.")
-		#with open(port,"rb") as f:
-			#	data=f.read()
-			#	printerbinary=data.encode('ascii')
-			#print printerbinary  #CDH How do you work with pure binary data in pyhton?
+			print("pause queue")
+			with open("Setup.py", "w") as f:
+				f.write("""#! /usr/bin/env python3
+#This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
+
+def N():
+	n="0"
+	return n""")
+			importlib.reload(Setup)
+			self.connectPrinterText.set("Connect Printer")
+			self.connectPrinterLabel.set("")
 
 	def AddToQueue(self):	
 		WriteToQueue()
@@ -142,8 +196,8 @@ class Application(Frame):
 
 	def RemoveFromQueue(self):
 		index = self.QueueList.index(ACTIVE)
-		print(self.QueueList)
-		DeleteFromQueue(index)
+		fileName=currentQueue[index]
+		DeleteFromQueue(fileName)
 		self.QueueList.delete(index)
 
 	def MakeNormal(self):
@@ -202,9 +256,9 @@ class Application(Frame):
 						self.QueueList.insert(END,i)
 			except:
 				print ("something wrong")
-
+		
+		global currentQueue
 		currentQueue = list(self.QueueList.get(0,END))
-
 		self.CompareList = self.QueueList.get(0,END)
 		self.after(1000, self.LoopDir)
 
@@ -216,7 +270,7 @@ class Application(Frame):
 		self.printqueue.grid(row=0,column=1, sticky = E)
 
 		self.updownframe = Frame(self, height = 50, width = 50)
-		self.updownframe.grid(row=1,column=1, sticky = E)
+		self.updownframe.grid(row=2,column=1, sticky = E)
 
 		self.addqueue = Button(self)
 		self.addqueue["text"] = "Add to Queue",
@@ -228,23 +282,29 @@ class Application(Frame):
 		self.removequeue["command"] = self.RemoveFromQueue
 		self.removequeue.grid(row=0,column=3, sticky = E)  
 
+		self.connectPrinterText=StringVar()
+		self.connectPrinterText.set("Connect Printer")
 		self.connectprinter = Button(self)
-		self.connectprinter["text"] = "Connect Printer",
+		self.connectprinter["textvariable"] = self.connectPrinterText,
 		self.connectprinter["command"] = self.ConnectToPrinter
 		self.connectprinter.grid(row=0,column=0, sticky = E)
+		
+		self.connectPrinterLabel=StringVar()
+		self.connectprinterlabel=Label(self,textvariable=self.connectPrinterLabel)
+		self.connectprinterlabel.grid(row=1,column=0, sticky = E)	
 
 		self.moveup = Button(self.updownframe)
 		self.moveup["text"] = u'\u25b2'
 		self.moveup["command"] = self.MoveUp
-		self.moveup.grid(row=1,column=2, sticky = E)
+		self.moveup.grid(row=2,column=2, sticky = E)
 
 		self.movedown = Button(self.updownframe)
 		self.movedown["text"] = u'\u25bc'
 		self.movedown["command"] = self.MoveDown
-		self.movedown.grid(row=2,column=2, sticky = E)
+		self.movedown.grid(row=3,column=2, sticky = E)
 
-		self.QueueList = Listbox(self)
-		self.QueueList.grid(row=1,column=0, sticky = S, columnspan = 2, pady = 10)
+		self.QueueList = Listbox(self,xscrollcommand=True,yscrollcommand=True)
+		self.QueueList.grid(row=2,column=0, sticky = S, columnspan = 2, pady = 10)
 
   
 	def __init__(self, master=None):
@@ -267,4 +327,3 @@ try:
 	root.destroy()
 except:
 	print ("closed")
-

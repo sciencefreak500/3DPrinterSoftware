@@ -7,7 +7,7 @@ def DeviceName():	#return command doesn't work unless in a function
 	DeviceName=["Ultimaker2","Bukito","Red Wheel Mouse"] #Places in Arrays correspond with each other
 	return DeviceName
 def	Device(): 
-	ID=["b'2341:0042'","b'16c0:0483'","b'04b3:310b'"] #The b's are to accomodate the way python proccess lsusb
+	ID=["b'2341:0042'","b'16c0:0483'","b'04b3:310b'"] #The b's are to accomodate the way python procceses lsusb
 	return ID
 DeviceName()
 Device()
