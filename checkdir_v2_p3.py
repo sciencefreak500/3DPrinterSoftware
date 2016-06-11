@@ -196,7 +196,8 @@ def N():
 
 	def RemoveFromQueue(self):
 		index = self.QueueList.index(ACTIVE)
-		fileName=currentQueue[index]
+		fileName=PrinterQueue.CurrentFileName()
+		fileName=fileName[index]
 		DeleteFromQueue(fileName)
 		self.QueueList.delete(index)
 
@@ -213,7 +214,7 @@ def N():
 		except:
 			return
 		if pos == 0:
-			print ("is zero")
+			print ("is beggining")
 			return
 		text = l.get(pos)
 		l.delete(pos)
@@ -235,32 +236,11 @@ def N():
 		l.selection_set(pos+1)
 
 	def LoopDir(self):
-		PrintList =PrinterQueue.CurrentFileName()
-		if PrintList != self.CompareList:
-			try:
-				if len(PrintList) > len(self.CompareList):  ##something needs to be added
-					temp = list(set(PrintList) - set(self.CompareList))
-					for i in temp:
-						self.QueueList.insert(END,i)
-
-				elif len(PrintList) < len(self.CompareList):   ##something needs to be removed
-					temp = list(set(self.CompareList) - set(PrintList))
-					for i in temp:
-						gone = self.CompareList.index(i)
-						self.QueueList.delete(gone)
-				elif set(PrintList) == set(self.CompareList):
-					pass
-				else:   ##Something bad happened, reset list
-					self.QueueList.delete(0, END)
-					for i in PrintList:
-						self.QueueList.insert(END,i)
-			except:
-				print ("something wrong")
-		
-		global currentQueue
-		currentQueue = list(self.QueueList.get(0,END))
-		self.CompareList = self.QueueList.get(0,END)
-		self.after(1000, self.LoopDir)
+		self.QueueList.delete(0, END)
+		fileName=PrinterQueue.CurrentFileName()
+		for i in fileName:
+			self.QueueList.insert(END,i)	
+		self.after(10000, self.LoopDir) #active value needs to be cataglogged so that it isn't lost when LoopDir resets
 
 	def createWidgets(self):
 
@@ -305,10 +285,10 @@ def N():
 
 		self.QueueList = Listbox(self,xscrollcommand=True,yscrollcommand=True)
 		self.QueueList.grid(row=2,column=0, sticky = S, columnspan = 2, pady = 10)
+		self.LoopDir()
 
   
 	def __init__(self, master=None):
-		self.CompareList = []
 		Frame.__init__(self, master)
 		self.grid()
 		self.createWidgets()
