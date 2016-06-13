@@ -16,9 +16,9 @@ with open("Setup.py", "w") as f:
 	f.write("""#! /usr/bin/env python3
 #This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
 
-def N():
-	n="0"
-	return n""")
+def FirstRun():
+	firstRun="0"
+	return firstRun""")
 importlib.reload(Setup)
 ####### FUNCTIONS #######	
 
@@ -140,12 +140,12 @@ def GetUSB():
 
 class Application(Frame):
 	def ConnectToPrinter(self):
-		n=Setup.N()
-		if n=="0":
+		firstRun=Setup.FirstRun()
+		if firstRun=="0":
 			PortsnNames=GetUSB()
 			Ports=PortsnNames[0]
 			Names=PortsnNames[1]
-			if Ports== []: #Weather the printer is connected or not needs to be displayed in the GUI
+			if Ports== []:
 				self.connectPrinterLabel.set("No Printer was Found")
 			elif len(Ports)==1:
 				with open("Setup.py", "w") as f:
@@ -163,26 +163,26 @@ def N():
 					f.write("""#! /usr/bin/env python3
 #This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
 
-def N():
-	n="1"
-	return n""")
+def FirsRun():
+	firstRun="1"
+	return firstRun""")
 				importlib.reload(Setup)
-				self.connectPrinterText.set("Disconnect Printer")
 				Name="GUI needs to be created to select which printer to connect to in case of multiple printers found."	#GUI needs to be created to select which printer to connect to in case of multiple printers found.
+				self.connectPrinterText.set("Disconnect Printer")
 				self.connectPrinterLabel.set("Connected to "+str(Name))
 			#with open(port,"rb") as f:
 				#	data=f.read()
 				#	printerbinary=data.encode('ascii')
 				#print printerbinary  #CDH How do you work with pure binary data in pyhton?
 		else:
-			print("pause queue")
+			print("pause queue") 
 			with open("Setup.py", "w") as f:
 				f.write("""#! /usr/bin/env python3
 #This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
 
-def N():
-	n="0"
-	return n""")
+def FirstRun():
+	firstRun="0"
+	return firstRun""")
 			importlib.reload(Setup)
 			self.connectPrinterText.set("Connect Printer")
 			self.connectPrinterLabel.set("")
@@ -239,8 +239,9 @@ def N():
 		self.QueueList.delete(0, END)
 		fileName=PrinterQueue.CurrentFileName()
 		for i in fileName:
-			self.QueueList.insert(END,i)	
-		self.after(10000, self.LoopDir) #active value needs to be cataglogged so that it isn't lost when LoopDir resets
+			self.QueueList.insert(END,i)
+		self.after(10000,self.LoopDir) #active value needs to be cataglogged so that it isn't lost when LoopDir resets, it resets because list is deleted
+		
 
 	def createWidgets(self):
 
