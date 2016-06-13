@@ -1,8 +1,0 @@
-TO DO!
-
-idiot proof the add directory button
-check directory every 30 seconds, not every sec
-find easier way to modify the queue
-add reorganize buttons to queue
-minimize, not hide to background
-sort through USB device query
