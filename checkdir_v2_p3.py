@@ -146,15 +146,15 @@ class Application(Frame):
 			Ports=PortsnNames[0]
 			Names=PortsnNames[1]
 			if Ports== []:
-				self.connectPrinterLabel.set("No Printer was Found")
+				self.connectPrinterLabel.set("No Printer was Found")#Needs to be changed to pop up menu asking if this is an error and to start enacting secondary method of connection.
 			elif len(Ports)==1:
 				with open("Setup.py", "w") as f:
 					f.write("""#! /usr/bin/env python3
 #This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
 
-def N():
-	n="1"
-	return n""")
+def FirstRun():
+	firstRun="1"
+	return firstRun""")
 				importlib.reload(Setup)
 				self.connectPrinterText.set("Disconnect Printer")
 				self.connectPrinterLabel.set("Connected to "+str(Names))
