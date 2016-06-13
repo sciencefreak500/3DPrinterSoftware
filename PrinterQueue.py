@@ -2,6 +2,7 @@
 #This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
 
 def CurrentFileName():
+<<<<<<< HEAD
 	currentFileName=['checkdir_v2_p3.py', 'checkdir_v2.py', 'PrinterQueue.py']
 	return currentFileName
 def CurrentFilePath():
@@ -13,3 +14,6 @@ def CurrentPrintNumber():
 def CurrentPrintType():
 	currentPrintType=[]
 	return currentPrintType
+=======
+	currentFileName=
+>>>>>>> 5061bc8072c4c38c865c71175049d50a8f7476a2
