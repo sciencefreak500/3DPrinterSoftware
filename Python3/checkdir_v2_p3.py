@@ -18,13 +18,27 @@ import re
 import subprocess
 import sys
 import importlib
-import PrinterRainbowTable
-import PrinterQueue
+
+
+
+
+#######VARIABLES########
+
+#Add on to the devices by adding to the list in the categories. make sure the element index is the same
+Printers = {
+        'DeviceName':["Ultimaker2","Bukito","Red Wheel Mouse"],
+        'ID': ["2341:0042","16c0:0483","04b3:310b"]
+        }
+
+
 
 ####### FUNCTIONS #######	
 
+#What is this function for? Meta-programming? No need for it I think
+'''
 def WriteToQueue():
 	importlib.reload(PrinterQueue)
+	
 	filePath = filedialog.askopenfilename()
 	currentFilePath=PrinterQueue.CurrentFilePath()
 	currentFilePath.append(filePath)
@@ -98,7 +112,10 @@ CurrentFilePath()
 CurrentPrintNumber()
 CurrentPrintType()""")
 	importlib.reload(PrinterQueue)
-def GetUSB():
+
+'''
+	
+def GetUSB():  #we have to find a replacement for this, unfortunately I can't access Windows' commands
 	device_re = re.compile("Bus\s+(?P<bus>\d+)\s+Device\s+(?P<device>\d+).+ID\s(?P<id>\w+:\w+)\s(?P<tag>.+)$", re.I)
 	if os.name == 'nt':
 		#df = subprocess.check_output("lsusb", shell=True) windows equivelent
@@ -113,8 +130,8 @@ def GetUSB():
 				dinfo = info.groupdict()
 				dinfo['device'] = '/dev/bus/usb/%s/%s' % (dinfo.pop('bus'), dinfo.pop('device'))
 				devices.append(dinfo) 
-	ID=PrinterRainbowTable.Device()
-	DeviceName=PrinterRainbowTable.DeviceName()
+	#ID=PrinterRainbowTable.Device()
+	#DeviceName=PrinterRainbowTable.DeviceName()
 	n=int(0)
 	while int(len(devices)-1)>=n:
 		dID=devices[n]
@@ -150,7 +167,7 @@ class Application(Frame):
 			#print printerbinary  #CDH How do you work with pure binary data in pyhton?
 
 	def AddToQueue(self):	
-		WriteToQueue()
+		#WriteToQueue()
 		fileName=PrinterQueue.CurrentFileName()
 		fileName=fileName[int(len(fileName)-1)]
 		self.QueueList.insert(END,fileName)
@@ -159,7 +176,7 @@ class Application(Frame):
 	def RemoveFromQueue(self):
 		index = self.QueueList.index(ACTIVE)
 		print(self.QueueList)
-		DeleteFromQueue(index)
+		#DeleteFromQueue(index)
 		self.QueueList.delete(index)
 
 	def MakeNormal(self):
@@ -283,4 +300,6 @@ try:
 	root.destroy()
 except:
 	print ("closed")
+
+
 
