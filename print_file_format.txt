@@ -1,0 +1,11 @@
+#!/usr/bin/python
+#This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
+refrence=[[mode,Type,File],[number],[start_time,end_time]]
+mode="number or time"
+<<<<<<< HEAD:print_file_format
+Type="local or network"
+>>>>>>> 5077672b22ee9aad784a1712fc1e813e172bf22f:print_file_format.txt
+File="/path/to/file"
+number="number of times to print"
+start_time="start time of print"
+end_time="end time of print"

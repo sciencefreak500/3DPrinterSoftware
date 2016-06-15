@@ -1,0 +1,1 @@
+checkdir_v2_p3.py uses Python3, its just an update from the previous printer queue from list version, and also contains the Name/ID of the printers.
