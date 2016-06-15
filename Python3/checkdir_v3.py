@@ -43,7 +43,7 @@ def SaveState():
     print("saved")
 
 
-def InitializeProgram():  #If first time running, set location, else pull from setup.inf
+def InitializeProgram():
     global CurrentQueue
     global ArchivedQueue
     try:
