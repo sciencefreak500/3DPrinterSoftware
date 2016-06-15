@@ -3,7 +3,7 @@
 
 '''
 --------------------DESCRIPTION----------------------------
-checkdir_v2.py is the newer version using Python2.7.5 where 
+checkdir_v3.py is the newer version using Python3 where 
 files are located on the computer, their location and filename 
 is stored in the list, and you can modify this array as you see fit.
 '''
