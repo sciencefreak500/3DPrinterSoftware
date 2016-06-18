@@ -17,6 +17,7 @@ from tkinter import *
 import subprocess
 import sys
 import pickle
+import multiPrinterMenuOptionCreator
 
 ####### SCRIPT VARIABLES #######
 
@@ -28,7 +29,7 @@ firstRun="0"
 #Add on to the devices by adding to the list in the categories. make sure the element index is the same
 Printers = {
         'DeviceName':["Ultimaker2","Bukito","Red Wheel Mouse"],
-        'ID': ["2341:0042","16c0:0483","04b3:310b"]
+        'ID': ["b'2341:0042'","b'16c0:0483'","b'04b3:310b'"] #The b's and 's are to accomodate the way python procceses lsusb
         }
 
 
@@ -72,7 +73,7 @@ def GetUSB():
 		USBInfo.append(str(i))
 	Ports= []
 	Names= []
-	ID=Printers['ID'] 
+	ID=Printers['ID']
 	DeviceName=Printers['DeviceName']
 	n=int(0)
 	while int(len(USBInfo)-1)>=n:
@@ -183,22 +184,20 @@ class Application(Frame):
             PortsnNames=GetUSB()
             Ports=PortsnNames[0]
             Names=PortsnNames[1]
-            if Ports== []:
-                self.connectPrinterLabel.set("No Printer was Found")#Needs to be changed to pop up menu asking if this is an error and to start enacting secondary method of connection.
-            elif len(Ports)==1:
-                firstRun="1"
-                self.connectPrinterText.set("Disconnect Printer")
-                self.connectPrinterLabel.set("Connected to "+str(Names))
+            firstRun="1"
+            with open('setup.inf','wb') as f:
+                    pickle.dump([CurrentQueue, ArchivedQueue, Names], f)
+            Printers=MultiPrinterMenuOptionCreator.Main()
+            print(Printers)
+            if Printers=="":
+                self.connectPrinterText.set("Printer not Found")
             else:
-                firstRun="1"
-                Name="GUI needs to be created to select which printer to connect to in case of multiple printers found."	#GUI needs to be created to select which printer to connect to in case of multiple printers found.
-                print(Name)
                 self.connectPrinterText.set("Disconnect Printer")
                 self.connectPrinterLabel.set("Connected to "+str(Name))
-			#with open(port,"rb") as f:
-				#	data=f.read()
-				#	printerbinary=data.encode('ascii')
-				#print printerbinary  #CDH How do you work with pure binary data in pyhton?
+            #with open(port,"rb") as f:
+                #data=f.read()
+                #printerbinary=data.encode('ascii')
+                #print printerbinary  #CDH How do you work with pure binary data in pyhton?
         else:
             print("pause queue") 
             firstRun="0"
