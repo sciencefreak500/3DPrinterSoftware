@@ -18,11 +18,16 @@ def Main():
 
 			self.label=tkinter.Label(self.top_frame,text="Choose as many printers you want to connect to.")
 			self.label.pack()
-		# Create three IntVar objects to use with
+		# Create IntVar objects to use with
 		# the Checkbuttons.
-			self.connect_button = tkinter.Button(self.bottom_frame,   text='Connect', command=self.show_choice)
-			self.notFound_button = tkinter.Button(self.bottom_frame,   text='Printer not Displayed', command=self.main_window.quit)
-
+			self.cb_var0 = tkinter.IntVar()
+			self.cb_var0.set(0)
+			self.cb0 = tkinter.Checkbutton(self.top_frame, text='Red Wheel Mouse', variable=self.cb_var0)
+			self.cb0.pack()
+			self.connect_button = tkinter.Button(self.bottom_frame, text='Connect')
+			self.connect_button["command"] = self.show_choice
+			self.notFound_button = tkinter.Button(self.bottom_frame, text='Printer not Displayed')
+			self.notFound_button["command"] = print("Secondary connection functionality")
 		# Pack the Buttons.
 			self.connect_button.pack(side='left')
 			self.notFound_button.pack(side='left')
@@ -38,13 +43,12 @@ def Main():
 
 		def show_choice(self):
 		# Create a message string.
-			self.message = 'You selected:
-'
-
-		# Determine which Checkbuttons are selected and build the message string accordingly.			return Printers
+			Printers=[]			
+		# Determine which Checkbuttons are selected
+			Printers.append(str(self.cb_var0.get()))
+			return Printers
 		# Display the message in an info dialog box.
-			messagebox.showinfo('Selection', self.message)
-
+			print(Printers)
+			self.main_window.quit
 	# Create an instance of the MyGUI class.
 	my_gui = MyGUI()
-Main()

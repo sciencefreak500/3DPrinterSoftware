@@ -17,7 +17,7 @@ from tkinter import *
 import subprocess
 import sys
 import pickle
-import multiPrinterMenuOptionCreator
+import MultiPrinterMenuOptionCreator
 
 ####### SCRIPT VARIABLES #######
 
@@ -49,7 +49,7 @@ def InitializeProgram():
     global ArchivedQueue
     try:
         with open('setup.inf','rb') as f:
-            CurrentQueue, ArchivedQueue = pickle.load(f)
+            CurrentQueue, ArchivedQueue, Names = pickle.load(f)
     except:
             file = open('setup.inf','wb')
             file.close()
@@ -184,16 +184,16 @@ class Application(Frame):
             PortsnNames=GetUSB()
             Ports=PortsnNames[0]
             Names=PortsnNames[1]
-            firstRun="1"
             with open('setup.inf','wb') as f:
-                    pickle.dump([CurrentQueue, ArchivedQueue, Names], f)
+                    pickle.dump([Names], f)
             Printers=MultiPrinterMenuOptionCreator.Main()
             print(Printers)
             if Printers=="":
                 self.connectPrinterText.set("Printer not Found")
             else:
+                firstRun="1"
                 self.connectPrinterText.set("Disconnect Printer")
-                self.connectPrinterLabel.set("Connected to "+str(Name))
+                self.connectPrinterLabel.set("Connected to "+str(Printers))
             #with open(port,"rb") as f:
                 #data=f.read()
                 #printerbinary=data.encode('ascii')
