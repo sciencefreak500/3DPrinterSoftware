@@ -29,9 +29,8 @@ firstRun="0"
 #Add on to the devices by adding to the list in the categories. make sure the element index is the same
 Printers = {
         'DeviceName':["Ultimaker2","Bukito","Red Wheel Mouse"],
-        'ID': ["b'2341:0042'","b'16c0:0483'","b'04b3:310b'"] #The b's and 's are to accomodate the way python procceses lsusb
+        'ID': ["2341:0042","16c0:0483","04b3:310b"]
         }
-
 
 
 ####### FUNCTIONS #######
@@ -49,7 +48,7 @@ def InitializeProgram():
     global ArchivedQueue
     try:
         with open('setup.inf','rb') as f:
-            CurrentQueue, ArchivedQueue, Names = pickle.load(f)
+            CurrentQueue, ArchivedQueue = pickle.load(f)
     except:
             file = open('setup.inf','wb')
             file.close()
@@ -64,7 +63,7 @@ def GetUSB():
 	if sys.platform == 'win32':
 		#df = subprocess.check_output("lsusb", shell=True) needs windows equivelent
 		pass
-	elif sys.platform == 'darwin': #df = subprocess.check_output("lsusb", shell=True) needs mac equivelent
+	elif sys.platform == 'darwin': #df = subprocess.check_output("lsusb", shell=True) mac equivelent is system_profiler SPUSBDataType to raplce lsusb
 		pass
 	else:
 		USB = subprocess.check_output("lsusb", shell=True)
@@ -79,7 +78,8 @@ def GetUSB():
 	while int(len(USBInfo)-1)>=n:
 		m=int(0)
 		while int(len(ID)-1)>=m:
-			if USBInfo[n]==ID[m]: 
+			subUSBInfo=USBInfo[n]
+			if subUSBInfo[2:11]==ID[m]: 
 				bus=USBInfo[int(n-4)]
 				device=USBInfo[int(n-2)]
 				Path=str("/dev/bus/usb/"+bus[2:5]+"/"+device[2:5])
@@ -186,18 +186,33 @@ class Application(Frame):
             Names=PortsnNames[1]
             with open('setup.inf','wb') as f:
                     pickle.dump([Names], f)
-            Printers=MultiPrinterMenuOptionCreator.Main()
-            print(Printers)
-            if Printers=="":
-                self.connectPrinterText.set("Printer not Found")
+            MultiPrinterMenuOptionCreator.Main()
+            with open('setup.inf','rb') as f:
+                Printers=pickle.load(f)
+            if Names==[]:
+                self.connectPrinterLabel.set("No Printer was Found")
             else:
                 firstRun="1"
-                self.connectPrinterText.set("Disconnect Printer")
-                self.connectPrinterLabel.set("Connected to "+str(Printers))
-            #with open(port,"rb") as f:
-                #data=f.read()
-                #printerbinary=data.encode('ascii')
-                #print printerbinary  #CDH How do you work with pure binary data in pyhton?
+                conPrinters=[]
+                conPorts=[]
+                n=0
+                while n<len(Names):
+                    if str(Printers[n])=="['1']":
+                        conPrinters.append(Names[n])
+                        conPorts.append(Ports[n])
+                    n+=1
+                if str(conPorts)=='[]':
+                    self.connectPrinterLabel.set("No Printer was Selected")
+                    firstRun="0"
+                else:
+                    self.connectPrinterText.set("Disconnect Printer")
+                    self.connectPrinterLabel.set("Connected to "+str(conPrinters))
+            n=0
+            while n<len(conPorts) and conPorts[0]!='[]':
+                with open(conPorts[n],"rb") as f:
+                    data=f.read()
+                print (data) 
+                n+=1 
         else:
             print("pause queue") 
             firstRun="0"

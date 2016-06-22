@@ -3,7 +3,7 @@
 #Second TK user menu, in order to pick which printer or printers to connect to in case of multiple printers
 
 import tkinter
-from tkinter import messagebox
+import pickle
 
 def Main():
 	class MyGUI:
@@ -20,14 +20,9 @@ def Main():
 			self.label.pack()
 		# Create IntVar objects to use with
 		# the Checkbuttons.
-			self.cb_var0 = tkinter.IntVar()
-			self.cb_var0.set(0)
-			self.cb0 = tkinter.Checkbutton(self.top_frame, text='Red Wheel Mouse', variable=self.cb_var0)
-			self.cb0.pack()
-			self.connect_button = tkinter.Button(self.bottom_frame, text='Connect')
-			self.connect_button["command"] = self.show_choice
+			self.connect_button = tkinter.Button(self.bottom_frame,text='Connect',command=self.show_choice)
 			self.notFound_button = tkinter.Button(self.bottom_frame, text='Printer not Displayed')
-			self.notFound_button["command"] = print("Secondary connection functionality")
+			self.notFound_button["command"] = self.secConFunct
 		# Pack the Buttons.
 			self.connect_button.pack(side='left')
 			self.notFound_button.pack(side='left')
@@ -39,16 +34,14 @@ def Main():
 
 		# Start the mainloop.
 			tkinter.mainloop()
-		# The show_choice method is the callback function for the OK button.
-
+		def secConFunct(self):
+			print("Secondary connection functionality")
+		# The show_choice method is the callback function for the connect button.
 		def show_choice(self):
-		# Create a message string.
-			Printers=[]			
-		# Determine which Checkbuttons are selected
-			Printers.append(str(self.cb_var0.get()))
-			return Printers
-		# Display the message in an info dialog box.
-			print(Printers)
-			self.main_window.quit
+			Printers=[]
+			with open('setup.inf','wb') as f:
+				pickle.dump([Printers], f)
+			self.main_window.quit()
+			self.main_window.destroy()
 	# Create an instance of the MyGUI class.
 	my_gui = MyGUI()

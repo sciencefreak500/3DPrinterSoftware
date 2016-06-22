@@ -28,12 +28,9 @@ def Main():
 			self.cb_var3.set(0)
 		#mpk Create the Checkbutton widgets in the top_frame.
 			self.label=tkinter.Label(self.top_frame,text="Choose as many printers you want to connect to.")
-			self.cb1 = tkinter.Checkbutton(self.top_frame, \
-text='Option 1', variable=self.cb_var1)
-			self.cb2 = tkinter.Checkbutton(self.top_frame, \
-text='Option 2', variable=self.cb_var2)
-			self.cb3 = tkinter.Checkbutton(self.top_frame, \
-text='Option 3', variable=self.cb_var3)
+			self.cb1 = tkinter.Checkbutton(self.top_frame, text='Option 1', variable=self.cb_var1)
+			self.cb2 = tkinter.Checkbutton(self.top_frame, text='Option 2', variable=self.cb_var2)
+			self.cb3 = tkinter.Checkbutton(self.top_frame, text='Option 3', variable=self.cb_var3)
 
 		#mpk Pack the Checkbuttons.
 			self.cb1.pack()
@@ -70,7 +67,7 @@ text='Option 3', variable=self.cb_var3)
 				self.message = self.message + '2\n'
 			if self.cb_var3.get() == 1:
 				self.message = self.message + '3\n'
-
+			print(self.message)
 		#mpk Display the message in an info dialog box.
 			messagebox.showinfo('Selection', self.message)
 
