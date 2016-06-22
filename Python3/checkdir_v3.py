@@ -66,27 +66,27 @@ def GetUSB():
 	elif sys.platform == 'darwin': #df = subprocess.check_output("lsusb", shell=True) mac equivelent is system_profiler SPUSBDataType to raplce lsusb
 		pass
 	else:
-		USB = subprocess.check_output("lsusb", shell=True)
-	USBInfo= []
-	for i in USB.split():
-		USBInfo.append(str(i))
-	Ports= []
-	Names= []
-	ID=Printers['ID']
-	DeviceName=Printers['DeviceName']
-	n=int(0)
-	while int(len(USBInfo)-1)>=n:
-		m=int(0)
-		while int(len(ID)-1)>=m:
-			subUSBInfo=USBInfo[n]
-			if subUSBInfo[2:11]==ID[m]: 
-				bus=USBInfo[int(n-4)]
-				device=USBInfo[int(n-2)]
-				Path=str("/dev/bus/usb/"+bus[2:5]+"/"+device[2:5])
-				Ports.append(Path)
-				Names.append(DeviceName[m])
-			m+=1
-		n+=1
+	    USB = subprocess.check_output("lsusb", shell=True)
+	    USBInfo= []
+	    for i in USB.split():
+		    USBInfo.append(str(i))
+	    Ports= []
+	    Names= []
+	    ID=Printers['ID']
+	    DeviceName=Printers['DeviceName']
+	    n=int(0)
+	    while int(len(USBInfo)-1)>=n:
+	        m=int(0)
+	        while int(len(ID)-1)>=m:
+	            subUSBInfo=USBInfo[n]
+	            if subUSBInfo[2:11]==ID[m]: 
+	                bus=USBInfo[int(n-4)]
+	                device=USBInfo[int(n-2)]
+	                Path=str("/dev/bus/usb/"+bus[2:5]+"/"+device[2:5])
+	                Ports.append(Path)
+	                Names.append(DeviceName[m])
+	            m+=1
+	        n+=1
 	PortsnNames=[Ports,Names]
 	return PortsnNames #this is the path to the printer
 
@@ -290,4 +290,3 @@ try:
 except:
     SaveState()
     print ("closed")
-
