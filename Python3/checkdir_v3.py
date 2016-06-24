@@ -17,7 +17,8 @@ from tkinter import *
 import subprocess
 import sys
 import pickle
-import MultiPrinterMenuOptionCreator
+import ConnectPrinterMenuOptionCreator
+import AddQueueMenuCreator
 
 ####### SCRIPT VARIABLES #######
 
@@ -105,13 +106,15 @@ class Application(Frame):
             self.QueueList.insert(END,i['Name'])
 
     def AddToQueue(self):
+        with open('setup.inf','wb') as f:
+                    pickle.dump([conPrinters], f)
+        AddQueueMenuCreator.Main()
+        #with open('setup.inf','rb') as f:
+        #        QueueAddition=pickle.load(f)
         filepath = filedialog.askopenfilename()
         fileName = filepath.split('/')[-1]
-        ##
-        #other questions to get further info about file (times to print, time, etc)
-        ##
-        tempdict = {'Name': fileName, 'Path': filepath}
-        CurrentQueue.append(tempdict)
+        QueueAddition = {'Name': fileName, 'Path': filepath}
+        CurrentQueue.append(QueueAddition)
         self.QueueList.insert(END,fileName)
         SaveState()
     
@@ -186,7 +189,7 @@ class Application(Frame):
             Names=PortsnNames[1]
             with open('setup.inf','wb') as f:
                     pickle.dump([Names], f)
-            MultiPrinterMenuOptionCreator.Main()
+            ConnectPrinterMenuOptionCreator.Main()
             with open('setup.inf','rb') as f:
                 Printers=pickle.load(f)
             if Names==[]:
@@ -290,3 +293,4 @@ try:
 except:
     SaveState()
     print ("closed")
+

@@ -1,14 +1,14 @@
 #! /usr/bin/env python3
 #This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
 
-import MultiPrinterMenu
+import ConnectPrinterMenu
 import pickle
 import importlib
 
 def Main():
 	with open('setup.inf','rb') as f:
 		Names=pickle.load(f)
-	with open("MultiPrinterMenu.py",'w') as f:
+	with open("ConnectPrinterMenu.py",'w') as f:
 		f.write("""#! /usr/bin/env python3
 #This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
 #Second TK user menu, in order to pick which printer or printers to connect to in case of multiple printers
@@ -78,5 +78,5 @@ text='"+Name[2:len(Name)-2]+"', variable=self.cb_var"+str(n)+",command=self.fcb"
 			self.main_window.destroy()
 	# Create an instance of the MyGUI class.
 	my_gui = MyGUI()""")
-	importlib.reload(MultiPrinterMenu)
-	MultiPrinterMenu.Main()
+	importlib.reload(ConnectPrinterMenu)
+	ConnectPrinterMenu.Main()
