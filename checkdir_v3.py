@@ -191,10 +191,12 @@ class Application(Frame):
             else:
                 firstRun="1"
                 conPorts=[]
+                Printers=Printers[0]
                 n=0
                 while n<len(Names):
                     global conPrinters
-                    if str(Printers[n])=="['1']":
+                    print(Printers)
+                    if str(Printers[n])=='1':
                         conPrinters.append(Names[n])
                         conPorts.append(Ports[n])
                     n+=1
@@ -267,6 +269,9 @@ class Application(Frame):
         self.QueueList = Listbox(self)
         self.QueueList.grid(row=1,column=0, columnspan = 2, pady = 10)
 
+        self.printingLabel=StringVar()
+        self.printinglabel=Label(self,textvariable=self.printingLabel)
+        self.printinglabel.grid(row=2,column=2, sticky = E)
   
     def __init__(self, master=None):
         self.CompareList = []

@@ -8,6 +8,7 @@ import importlib
 def Main():
 	with open('setup.inf','rb') as f:
 		conPrinters=pickle.load(f)
+	conPrinters=conPrinters[0]
 	with open("AddQueueMenu.py",'w') as f:
 		f.write("""#! /usr/bin/env python3
 #This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
@@ -52,7 +53,7 @@ def Main():
 			f.write("			self.cb_var"+str(n)+" = IntVar()\n")
 			f.write("			self.cb_var"+str(n)+".set(0)\n")
 			f.write("			self.cb"+str(n)+" = Checkbutton(self.middle_frame, \
-text='"+Name[2:len(Name)-2]+"', variable=self.cb_var"+str(n)+",command=self.fcb"+str(n)+")\n")
+text='"+Name+"', variable=self.cb_var"+str(n)+",command=self.fcb"+str(n)+")\n")
 			f.write("			self.cb"+str(n)+".pack()\n")
 			n+=1
 		f.write("""			self.add_button = Button(self.bottom_frame,text='Add to Queue',command=self.show_choice)
@@ -93,7 +94,7 @@ text='"+Name[2:len(Name)-2]+"', variable=self.cb_var"+str(n)+",command=self.fcb"
 		while n<len(conPrinters) and str(conPrinters[0])!="[]":
 			Name=str(conPrinters[n])
 			f.write("			if str(self.cb_var"+str(n)+".get())=='1':\n")
-			f.write("				printers.append('"+str(Name[2:len(Name)-2])+"')\n")
+			f.write("				printers.append('"+str(Name)+"')\n")
 			n+=1
 		f.write("""			number=int(self.number_entry.get())
 			QueueAddition = {'Name': fileName, 'Path': filepath, 'Printers': printers, 'Number': number}

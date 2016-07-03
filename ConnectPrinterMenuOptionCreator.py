@@ -8,6 +8,7 @@ import importlib
 def Main():
 	with open('setup.inf','rb') as f:
 		Names=pickle.load(f)
+	Names=Names[0]
 	with open("ConnectPrinterMenu.py",'w') as f:
 		f.write("""#! /usr/bin/env python3
 #This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, #You can obtain one at https://mozilla.org/MPL/2.0/
@@ -35,10 +36,11 @@ def Main():
 		n=0
 		while n<len(Names) and str(Names[0])!="[]":
 			Name=str(Names[n])
+			print(Name)
 			f.write("			self.cb_var"+str(n)+" = tkinter.IntVar()\n")
 			f.write("			self.cb_var"+str(n)+".set(0)\n")
 			f.write("			self.cb"+str(n)+" = tkinter.Checkbutton(self.top_frame, \
-text='"+Name[2:len(Name)-2]+"', variable=self.cb_var"+str(n)+",command=self.fcb"+str(n)+")\n")
+text='"+Name+"', variable=self.cb_var"+str(n)+",command=self.fcb"+str(n)+")\n")
 			f.write("			self.cb"+str(n)+".pack()\n")
 			n+=1
 		f.write("""			self.connect_button = tkinter.Button(self.bottom_frame,text='Connect',command=self.show_choice)
