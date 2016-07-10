@@ -26,6 +26,7 @@ CurrentQueue = []
 ArchivedQueue = []
 
 firstRun="0"
+sending="0"
 conPrinters=[]
 
 #Add on to the devices by adding to the list in the categories. make sure the element index is the same
@@ -53,7 +54,6 @@ def InitializeProgram():
     except:
             file = open('setup.inf','wb')
             file.close()
-    print (CurrentQueue)
     
                 
 #going to need to find another lib for this one, something cross platform
@@ -133,7 +133,24 @@ class Application(Frame):
         self.after(5000,self.MakeNormal)
 
     def SendToPrinter(self):
-        print ("functionality")
+        global CurrentQueue
+        global sending
+        if sending=="0":
+            sending="1"
+            self.QueueList.itemconfig(0,{'bg':'yellow'})
+            print(CurrentQueue)
+            i=CurrentQueue[0]
+            x=i[0]
+            z=int(x['Number'])-1
+            y=str(str(x['Name'])+" "*5+str(x['Printers'])+" "*5+str(z))
+            i[0]=y
+            CurrentQueue=[i]
+            print(CurrentQueue)
+            #    self.QueueList.insert(END,y)
+        else:
+            sending="0"
+            self.QueueList.itemconfig(0,{'bg':'white'})
+            print("pause queue")
 
     def MoveUp(self):
         l = self.QueueList
@@ -143,7 +160,7 @@ class Application(Frame):
             return
         if pos == 0:
             return
-        text = l.get(pos)
+        text = l.get(pos) 
         l.delete(pos)
         l.insert(pos-1, text)
         l.selection_set(pos-1)
