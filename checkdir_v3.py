@@ -63,7 +63,8 @@ def GetUSB():
 	if sys.platform == 'win32':
 		#df = subprocess.check_output("lsusb", shell=True) needs windows equivelent
 		pass
-	elif sys.platform == 'darwin': #df = subprocess.check_output("lsusb", shell=True) mac equivelent is system_profiler SPUSBDataType to raplce lsusb
+	elif sys.platform == 'darwin': 
+                USB = subprocess.check_output("system_profiler SPUSBDataType", shell=True) #mac equivelent is system_profiler SPUSBDataType to replace lsusb
 		pass
 	else:
 	    USB = subprocess.check_output("lsusb", shell=True)
