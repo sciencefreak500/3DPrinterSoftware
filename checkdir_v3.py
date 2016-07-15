@@ -19,6 +19,7 @@ import sys
 import pickle
 import ConnectPrinterMenuOptionCreator
 import AddQueueMenuCreator
+import time #just to be able to check functionality
 
 ####### SCRIPT VARIABLES #######
 
@@ -137,16 +138,23 @@ class Application(Frame):
         global sending
         if sending=="0":
             sending="1"
-            self.QueueList.itemconfig(0,{'bg':'yellow'})
-            print(CurrentQueue)
-            i=CurrentQueue[0]
-            x=i[0]
-            z=int(x['Number'])-1
-            y=str(str(x['Name'])+" "*5+str(x['Printers'])+" "*5+str(z))
-            i[0]=y
-            CurrentQueue=[i]
-            print(CurrentQueue)
-            #    self.QueueList.insert(END,y)
+            while str(CurrentQueue)!='[]':
+                sub=CurrentQueue[0]
+                x=sub[0]
+                while 0 < x['Number']:
+                    self.QueueList.itemconfig(0,{'bg':'yellow'})
+                    x['Number']=int(x['Number'])-1
+                    sub[0]=x
+                    CurrentQueue[0]=sub
+                    self.QueueList.delete(0)
+                    if x['Number']>0:
+                        y=str(str(x['Name'])+" "*5+str(x['Printers'])+" "*5+str(x['Number']))
+                        self.QueueList.insert(0,y)
+                        time.sleep(0.5) #just to be able to check functionality
+                        print("Printing")
+                    SaveState()
+                print("passing next item")
+                CurrentQueue.pop(0)
         else:
             sending="0"
             self.QueueList.itemconfig(0,{'bg':'white'})
