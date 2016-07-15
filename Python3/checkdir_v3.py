@@ -17,13 +17,21 @@ from tkinter import *
 import subprocess
 import sys
 import pickle
+<<<<<<< HEAD
 import ConnectPrinterMenuOptionCreator
 import AddQueueMenuCreator
+=======
+import MultiPrinterMenuOptionCreator
+import PrintProgramUI as gui
+>>>>>>> 3793699fb5590af91d5525912afff6ba820a83f0
 
 ####### SCRIPT VARIABLES #######
 
+
+
+
 CurrentQueue = []
-ArchivedQueue = []
+
 
 firstRun="0"
 
@@ -38,24 +46,22 @@ Printers = {
 
 def SaveState():
     global CurrentQueue
-    global ArchivedQueue
     with open('setup.inf','wb') as f:
-        pickle.dump([CurrentQueue, ArchivedQueue], f)
+        pickle.dump([CurrentQueue], f)
     print("saved")
 
 
 def InitializeProgram():
     global CurrentQueue
-    global ArchivedQueue
     try:
         with open('setup.inf','rb') as f:
-            CurrentQueue, ArchivedQueue = pickle.load(f)
+            CurrentQueue = pickle.load(f)
     except:
             file = open('setup.inf','wb')
             file.close()
 
     print (CurrentQueue)
-    print (ArchivedQueue)
+   
     
                 
 #going to need to find another lib for this one, something cross platform
@@ -98,13 +104,9 @@ def GetUSB():
 InitializeProgram()
 
 
-class Application(Frame):
 
-    def loadList(self):
-        print (CurrentQueue)
-        for i in CurrentQueue:
-            self.QueueList.insert(END,i['Name'])
 
+<<<<<<< HEAD
     def AddToQueue(self):
         with open('setup.inf','wb') as f:
                     pickle.dump([conPrinters], f)
@@ -135,7 +137,31 @@ class Application(Frame):
         self.after(5000,self.MakeNormal)
 
     def SendToPrinter(self):
-        print ("functionality")
+        global CurrentQueue
+        global sending
+        if sending=="0":
+            sending="1"
+            while str(CurrentQueue)!='[]':
+                sub=CurrentQueue[0]
+                x=sub[0]
+                while 0 < x['Number']:
+                    self.QueueList.itemconfig(0,{'bg':'yellow'})
+                    x['Number']=int(x['Number'])-1
+                    sub[0]=x
+                    CurrentQueue[0]=sub
+                    self.QueueList.delete(0)
+                    if x['Number']>0:
+                        y=str(str(x['Name'])+" "*5+str(x['Printers'])+" "*5+str(x['Number']))
+                        self.QueueList.insert(0,y)
+                        time.sleep(0.5) #just to be able to check functionality
+                        print("Printing")
+                    SaveState()
+                print("passing next item")
+                CurrentQueue.pop(0)
+        else:
+            sending="0"
+            self.QueueList.itemconfig(0,{'bg':'white'})
+            print("pause queue")
 
     def MoveUp(self):
         l = self.QueueList
@@ -216,70 +242,151 @@ class Application(Frame):
                     data=f.read()
                 print (data) 
                 n+=1 
+=======
+def loadList():
+    print (CurrentQueue)
+    for i in CurrentQueue:
+        #ui.PrintQueue.addItem(window,temp)
+        pass
+        
+            
+        
+    
+    #add CurrentQueue to GUI list
+    #for i in CurrentQueue:
+    #    self.QueueList.insert(END,i['Name'])
+
+def AddToQueue():
+    filepath = gui.QtGui.QFileDialog.getOpenFileName(window,'Select file to Add')
+    fileName = filepath.split('/')[-1]
+    ##
+    #other questions to get further info about file (times to print, time, etc)
+    ##
+    tempdict = {'Name': fileName, 'Path': filepath}
+    CurrentQueue.append(tempdict)
+    print("Added")
+    #add to GUI list (at end)
+    #self.QueueList.insert(END,fileName)
+    SaveState()
+
+def RemoveFromQueue():
+    #get active in GUI list, then delete it
+    #index = self.QueueList.index(ACTIVE)
+    #self.QueueList.delete(index)
+    print("deleted")
+    #CurrentQueue[index] = None
+    #CurrentQueue.remove(None)
+    #SaveState()
+    print(CurrentQueue)
+
+def MakeNormal():
+    print("return to normal")
+    #root.wm_state('normal')
+
+def PushBackground():
+    print ("minimizing")
+    #root.wm_state('withdrawn')
+    #self.after(5000,self.MakeNormal)
+
+def SendToPrinter():
+    print ("functionality")
+
+def MoveUp():
+    print('moved up')
+    #a = CurrentQueue[pos]
+    #b = CurrentQueue[pos-1]
+    #CurrentQueue[pos] = b
+    #CurrentQueue[pos-1] = a
+    SaveState()
+    #wipe GUI list, repopulate
+    #print(CurrentQueue)
+
+def MoveDown():
+    print('moved down')
+    #a = CurrentQueue[pos]
+    #b = CurrentQueue[pos+1]
+    #CurrentQueue[pos] = b
+    #CurrentQueue[pos+1] = a
+    SaveState()
+    #wipe GUI list, repopulate
+    #print(CurrentQueue)
+
+'''
+#pyusb should be working. Will test this.
+ #once again, going to need to find another lib for this.
+def ConnectToPrinter():
+    global firstRun
+    if firstRun=="0":
+        PortsnNames=GetUSB()
+        Ports=PortsnNames[0]
+        Names=PortsnNames[1]
+        with open('setup.inf','wb') as f:
+                pickle.dump([Names], f)
+        MultiPrinterMenuOptionCreator.Main()
+        with open('setup.inf','rb') as f:
+            Printers=pickle.load(f)
+        if Names==[]:
+            self.connectPrinterLabel.set("No Printer was Found")
+>>>>>>> 3793699fb5590af91d5525912afff6ba820a83f0
         else:
-            print("pause queue") 
-            firstRun="0"
-            self.connectPrinterText.set("Connect Printer")
-            self.connectPrinterLabel.set("")
-
-
-    def createWidgets(self):
-        self.background = Button(self)
-        self.background["text"] = "Push To Background",
-        self.background["command"] = self.PushBackground
-        self.background.grid(row=0,column=0, sticky = W)
-
-        self.printqueue = Button(self)
-        self.printqueue["text"] = "Print Queue",
-        self.printqueue["command"] = self.SendToPrinter
-        self.printqueue.grid(row=0,column=1, sticky = E)
-
-        self.updownframe = Frame(self, height = 50, width = 50)
-        self.updownframe.grid(row=1,column=1, sticky = E)
-
-        self.addqueue = Button(self)
-        self.addqueue["text"] = "Add to Queue",
-        self.addqueue["command"] = self.AddToQueue
-        self.addqueue.grid(row=0,column=2, sticky = E)
-
-        self.removequeue = Button(self)
-        self.removequeue["text"] = "Remove From Queue",
-        self.removequeue["command"] = self.RemoveFromQueue
-        self.removequeue.grid(row=0,column=3, sticky = E)  
-
-        self.connectPrinterLabel=StringVar()
-        self.connectprinterlabel=Label(self,textvariable=self.connectPrinterLabel)
-        self.connectprinterlabel.grid(row=2,column=2, sticky = E)
-	
-        self.connectPrinterText=StringVar()
+            firstRun="1"
+            conPrinters=[]
+            conPorts=[]
+            n=0
+            while n<len(Names):
+                if str(Printers[n])=="['1']":
+                    conPrinters.append(Names[n])
+                    conPorts.append(Ports[n])
+                n+=1
+            if str(conPorts)=='[]':
+                self.connectPrinterLabel.set("No Printer was Selected")
+                firstRun="0"
+            else:
+                self.connectPrinterText.set("Disconnect Printer")
+                self.connectPrinterLabel.set("Connected to "+str(conPrinters))
+        n=0
+        while n<len(conPorts) and conPorts[0]!='[]':
+            with open(conPorts[n],"rb") as f:
+                data=f.read()
+            print (data) 
+            n+=1 
+    else:
+        print("pause queue") 
+        firstRun="0"
         self.connectPrinterText.set("Connect Printer")
-        self.connectprinter = Button(self)
-        self.connectprinter["textvariable"] = self.connectPrinterText,
-        self.connectprinter["command"] = self.ConnectToPrinter
-        self.connectprinter.grid(row=1,column=2, sticky = E)
+        self.connectPrinterLabel.set("")
 
-        self.moveup = Button(self.updownframe)
-        self.moveup["text"] = u'\u25b2'
-        self.moveup["command"] = self.MoveUp
-        self.moveup.grid(row=1,column=1, sticky = E)
-
-        self.movedown = Button(self.updownframe)
-        self.movedown["text"] = u'\u25bc'
-        self.movedown["command"] = self.MoveDown
-        self.movedown.grid(row=2,column=1, sticky = E)
-
-        self.QueueList = Listbox(self)
-        self.QueueList.grid(row=1,column=0, sticky = S, columnspan = 2, pady = 10)
-
+'''
   
-    def __init__(self, master=None):
-        self.CompareList = []
-        Frame.__init__(self, master)
-        self.grid()
-        self.createWidgets()
-        self.loadList()
+def ExitApp():
+    sys.exit(app.exec_())
 
- 
+def FunctionGuiMap():
+    ui.UpButton.clicked.connect(MoveUp)
+    ui.DownButton.clicked.connect(MoveDown)
+    ui.actionPrint.triggered.connect(SendToPrinter)
+    ui.actionExit.triggered.connect(ExitApp)
+    ui.actionAdd_To_Queue.triggered.connect(AddToQueue)
+    ui.actionRemove_from_Queue.triggered.connect(RemoveFromQueue)
+
+    loadList()
+
+
+    
+
+if __name__ == "__main__":
+    app = gui.QtGui.QApplication(sys.argv)
+    window = gui.QtGui.QMainWindow()
+    ui = gui.Ui_window()
+    ui.setupUi(window)
+    FunctionGuiMap()
+    window.show()
+    sys.exit(app.exec_())
+
+
+
+
+'''
 root = Tk()
 entry = Entry()
 def handle(event):
@@ -293,4 +400,8 @@ try:
 except:
     SaveState()
     print ("closed")
+<<<<<<< HEAD
 
+=======
+'''
+>>>>>>> 3793699fb5590af91d5525912afff6ba820a83f0
