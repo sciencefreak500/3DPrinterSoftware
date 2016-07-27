@@ -22,7 +22,7 @@ def Main():
 		# the Checkbuttons.
 			self.cb_var0 = tkinter.IntVar()
 			self.cb_var0.set(0)
-			self.cb0 = tkinter.Checkbutton(self.top_frame, text='Red Wheel Mouse', variable=self.cb_var0,command=self.fcb0)
+			self.cb0 = tkinter.Checkbutton(self.top_frame, text='Bukito', variable=self.cb_var0,command=self.fcb0)
 			self.cb0.pack()
 			self.connect_button = tkinter.Button(self.bottom_frame,text='Connect',command=self.show_choice)
 			self.notFound_button = tkinter.Button(self.bottom_frame, text='Printer not Displayed')

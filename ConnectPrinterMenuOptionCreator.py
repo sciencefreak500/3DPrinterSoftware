@@ -36,7 +36,6 @@ def Main():
 		n=0
 		while n<len(Names) and str(Names[0])!="[]":
 			Name=str(Names[n])
-			print(Name)
 			f.write("			self.cb_var"+str(n)+" = tkinter.IntVar()\n")
 			f.write("			self.cb_var"+str(n)+".set(0)\n")
 			f.write("			self.cb"+str(n)+" = tkinter.Checkbutton(self.top_frame, \

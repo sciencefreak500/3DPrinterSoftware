@@ -17,9 +17,15 @@ from tkinter import *
 import subprocess
 import sys
 import pickle
+import os.path
 import ConnectPrinterMenuOptionCreator
 import AddQueueMenuCreator
 import time #just to be able to check functionality
+
+## non-native ##
+
+import usb #Hasn't been used yet, isn't needed for ubuntu
+import serial
 
 ####### SCRIPT VARIABLES #######
 
@@ -32,8 +38,9 @@ conPrinters=[]
 
 #Add on to the devices by adding to the list in the categories. make sure the element index is the same
 Printers = {
-        'DeviceName':["Ultimaker2","Bukito","Red Wheel Mouse"],
-        'ID': ["2341:0042","16c0:0483","04b3:310b"]
+        'DeviceName':["Ultimaker2","Bukito"],
+        'ID': ["2341:0042","16c0:0483",],
+        'UbuntuLinkID': ["unknown","usb-Deezmaker_Bukito__Bukito_-if00"]
         }
 
 
@@ -64,30 +71,19 @@ def GetUSB():
 		#df = subprocess.check_output("lsusb", shell=True) needs windows equivelent
 		pass
 	elif sys.platform == 'darwin': 
-                USB = subprocess.check_output("system_profiler SPUSBDataType", shell=True) #mac equivelent is system_profiler SPUSBDataType to replace lsusb
-		pass
+		USB = subprocess.check_output("system_profiler SPUSBDataType", shell=True) #mac equivelent is system_profiler SPUSBDataType to replace lsusb
 	else:
-	    USB = subprocess.check_output("lsusb", shell=True)
-	    USBInfo= []
-	    for i in USB.split():
-		    USBInfo.append(str(i))
-	    Ports= []
-	    Names= []
-	    ID=Printers['ID']
-	    DeviceName=Printers['DeviceName']
-	    n=int(0)
-	    while int(len(USBInfo)-1)>=n:
-	        m=int(0)
-	        while int(len(ID)-1)>=m:
-	            subUSBInfo=USBInfo[n]
-	            if subUSBInfo[2:11]==ID[m]: 
-	                bus=USBInfo[int(n-4)]
-	                device=USBInfo[int(n-2)]
-	                Path=str("/dev/bus/usb/"+bus[2:5]+"/"+device[2:5])
-	                Ports.append(Path)
-	                Names.append(DeviceName[m])
-	            m+=1
-	        n+=1
+            Ports=[]
+            Names=[]
+            DeviceName=Printers['DeviceName']
+            UbuntuLinkID=Printers['UbuntuLinkID']
+            n=0
+            while int(len(UbuntuLinkID)-1)>=n:
+                if str(os.path.islink(str('/dev/serial/by-id/'+UbuntuLinkID[n]))) == 'True':
+                        Path = str(os.path.realpath('/dev/serial/by-id/'+UbuntuLinkID[n]))
+                        Ports.append(Path)
+                        Names.append(DeviceName[n])
+                n+=1
 	PortsnNames=[Ports,Names]
 	return PortsnNames #this is the path to the printer
 
@@ -221,7 +217,6 @@ class Application(Frame):
                 n=0
                 while n<len(Names):
                     global conPrinters
-                    print(Printers)
                     if str(Printers[n])=='1':
                         conPrinters.append(Names[n])
                         conPorts.append(Ports[n])
@@ -234,9 +229,25 @@ class Application(Frame):
                     self.connectPrinterLabel.set("Connected to "+str(conPrinters))
             n=0
             while n<len(conPorts) and conPorts[0]!='[]':
-                with open(conPorts[n],"rb") as f:
-                    data=f.read()
-                print (data) 
+                ser=serial.Serial(conPorts[n],115200,timeout=1) #(port, baudrate, timeout
+                print(serial.Serial.get_settings(ser))
+                print(ser.readline())
+                ser.write(b''';FLAVOR:UltiGCode
+;TIME:17726
+;MATERIAL:32173
+;MATERIAL2:0
+;NOZZLE_DIAMETER:0.400000
+;NOZZLE_DIAMETER2:0.400000
+
+;Layer count: 408
+;LAYER:0
+M107
+G0 F9000 X94.009 Y59.091 Z0.300
+;TYPE:SKIRT
+G1 X0 Y0 E0
+G0 F9000 X0 Y0''') #This test might not work for all printers,works for bukito
+                print(ser.readline())
+                ser.close()
                 n+=1 
         else:
             print("pause queue") 

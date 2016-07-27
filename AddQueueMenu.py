@@ -34,6 +34,10 @@ def Main():
 			self.label.pack()
 		# Create IntVar objects to use with
 		# the Checkbuttons.
+			self.cb_var0 = IntVar()
+			self.cb_var0.set(0)
+			self.cb0 = Checkbutton(self.middle_frame, text='Bukito', variable=self.cb_var0,command=self.fcb0)
+			self.cb0.pack()
 			self.add_button = Button(self.bottom_frame,text='Add to Queue',command=self.show_choice)
 			self.notFound_button = Button(self.bottom_frame, text='Printer not Displayed')
 			self.notFound_button["command"] = self.secConFunct
@@ -58,8 +62,15 @@ def Main():
 			fileName = filepath.split('/')[-1]
 			self.chooseFileLabel.set("File Selected:"+str(fileName))
 		# The show_choice method is the callback function for the add to queue button.
+		def fcb0(self):
+			if self.cb_var0.get()==0:
+				self.cb_var0.set(1)
+			else:
+				self.cb_var0.set(0)
 		def show_choice(self):
 			printers=[]
+			if str(self.cb_var0.get())=='1':
+				printers.append('Bukito')
 			number=int(self.number_entry.get())
 			QueueAddition = {'Name': fileName, 'Path': filepath, 'Printers': printers, 'Number': number}
 			with open('setup.inf','wb') as f:
