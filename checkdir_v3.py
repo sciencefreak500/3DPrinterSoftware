@@ -20,7 +20,6 @@ import pickle
 import os.path
 import ConnectPrinterMenuOptionCreator
 import AddQueueMenuCreator
-import time #just to be able to check functionality
 
 ## non-native ##
 
@@ -147,8 +146,16 @@ class Application(Frame):
                     if x['Number']>0:
                         y=str(str(x['Name'])+" "*5+str(x['Printers'])+" "*5+str(x['Number']))
                         self.QueueList.insert(0,y)
-                        time.sleep(0.5) #just to be able to check functionality
-                        print("Printing")
+                        gfile=open(x['Path'])
+                        ser=serial.Serial(conPorts[0],115200,timeout=1) #(port, baudrate, timeout) needs to be able to handle more than one printer, also needs to stopgrabbing program
+                        print(serial.Serial.get_settings(ser))
+                        print(ser.readline())
+                        for line in gfile:
+                                gcode=bytes(gfile.readline(), 'utf-8')
+                                ser.write(gcode)
+                        print(ser.readline())
+                        ser.close()
+                        gfile.close()
                     SaveState()
                 print("passing next item")
                 CurrentQueue.pop(0)
@@ -198,6 +205,7 @@ class Application(Frame):
 
      #once again, going to need to find another lib for this.
     def ConnectToPrinter(self):
+        global conPorts
         global firstRun
         if firstRun=="0":
             PortsnNames=GetUSB()
