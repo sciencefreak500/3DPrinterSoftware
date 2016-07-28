@@ -134,6 +134,7 @@ class Application(Frame):
         global sending
         if sending=="0":
             sending="1"
+            self.printqueueText.set("Stop Printing Queue")
             while str(CurrentQueue)!='[]':
                 sub=CurrentQueue[0]
                 x=sub[0]
@@ -161,6 +162,7 @@ class Application(Frame):
                 CurrentQueue.pop(0)
         else:
             sending="0"
+            self.printqueueText.set("Print Queue")
             self.QueueList.itemconfig(0,{'bg':'white'})
             print("pause queue")
 
@@ -272,8 +274,10 @@ G0 F9000 X0 Y0''') #This test might not work for all printers,works for bukito
         self.background["command"] = self.PushBackground
         self.background.grid(row=0,column=0, sticky = W)
 
+        self.printqueueText=StringVar()
+        self.printqueueText.set("Print Queue")
         self.printqueue = Button(self)
-        self.printqueue["text"] = "Print Queue",
+        self.printqueue["textvariable"] = self.printqueueText,
         self.printqueue["command"] = self.SendToPrinter
         self.printqueue.grid(row=0,column=1, sticky = E)
 
