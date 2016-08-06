@@ -24,6 +24,7 @@ import AddQueueMenuCreator
 ## non-native ##
 
 import serial
+import serial.tools.list_ports as listports
 
 ####### SCRIPT VARIABLES #######
 
@@ -34,12 +35,8 @@ firstRun="0"
 sending="0"
 conPrinters=[]
 
-#Add on to the devices by adding to the list in the categories. make sure the element index is the same
-Printers = {
-        'DeviceName':["Ultimaker2","Bukito"],
-        'ID': ["2341:0042","16c0:0483",],
-        'UbuntuLinkID': ["unknown","usb-Deezmaker_Bukito__Bukito_-if00"]
-        }
+#Add on to the devices by adding to the list in the categories. make sure the element index is the same, the devide and vendor id's are in decimal
+Printers = {'DeviceName':["Ultimaker2","Bukito"], 'ID': ["2341:0042","5824:1155",]}
 
 
 ####### FUNCTIONS #######
@@ -64,26 +61,24 @@ def InitializeProgram():
                 
 #going to need to find another lib for this one, something cross platform
 def GetUSB():
-	global Printers
-	if sys.platform == 'win32':
-		#df = subprocess.check_output("lsusb", shell=True) needs windows equivelent
-		pass
-	elif sys.platform == 'darwin': 
-		USB = subprocess.check_output("system_profiler SPUSBDataType", shell=True) #mac equivelent is system_profiler SPUSBDataType to replace lsusb
-	else:
-            Ports=[]
-            Names=[]
-            DeviceName=Printers['DeviceName']
-            UbuntuLinkID=Printers['UbuntuLinkID']
-            n=0
-            while int(len(UbuntuLinkID)-1)>=n:
-                if str(os.path.islink(str('/dev/serial/by-id/'+UbuntuLinkID[n]))) == 'True':
-                        Path = str(os.path.realpath('/dev/serial/by-id/'+UbuntuLinkID[n]))
-                        Ports.append(Path)
-                        Names.append(DeviceName[n])
-                n+=1
-	PortsnNames=[Ports,Names]
-	return PortsnNames #this is the path to the printer
+        global Printers
+        Ports=[]
+        Names=[]
+        DeviceName=Printers['DeviceName']
+        ID=Printers['ID']
+        device = listports.comports()
+        for i in device:
+                vid=str(i.vid)
+                pid=str(i.pid)
+                PortID=str(vid+":"+pid)
+                for n, x in enumerate(ID):
+                        if str(x)==str(PortID):
+                                Path=str(i.device)
+                                Ports.append(Path)
+                                Names.append(DeviceName[n])
+        PortsnNames=[Ports,Names]
+        print(PortsnNames)
+        return PortsnNames #this is the path to the printer
 
 
 ####### MAIN SCRIPT #######
@@ -147,7 +142,7 @@ class Application(Frame):
                         y=str(str(x['Name'])+" "*5+str(x['Printers'])+" "*5+str(x['Number']))
                         self.QueueList.insert(0,y)
                         gfile=open(x['Path'])
-                        ser=serial.Serial(conPorts[0],115200,timeout=1) #(port, baudrate, timeout) needs to be able to handle more than one printer, also needs to stopgrabbing program
+                        ser=serial.Serial(conPorts[0],250000,timeout=1) #(port, baudrate, timeout) needs to be able to handle more than one printer, also needs to stopgrabbing program
                         print(serial.Serial.get_settings(ser))
                         print(ser.readline())
                         ser.write(b'''G92 E0
@@ -158,8 +153,7 @@ G28
                                 ser.write(gcode)
                         print(ser.readline())
                         ser.write(b'''G92 E0
-G28
-''')
+G28''')
                         ser.close()
                         gfile.close()
                         print("sweep bed")
@@ -245,7 +239,7 @@ G28
                     self.connectPrinterLabel.set("Connected to "+str(conPrinters))
             n=0
             while n<len(conPorts) and conPorts[0]!='[]':
-                ser=serial.Serial(conPorts[n],115200,timeout=1) #(port, baudrate, timeout
+                ser=serial.Serial(conPorts[n],250000,timeout=1) #(port, baudrate, timeout
                 print(serial.Serial.get_settings(ser))
                 print(ser.readline())
                 ser.write(b'''G92 E0
