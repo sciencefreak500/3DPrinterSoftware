@@ -151,12 +151,16 @@ class Application(Frame):
                         ser=serial.Serial(conPorts[0],115200,timeout=1) #(port, baudrate, timeout) needs to be able to handle more than one printer, also needs to stopgrabbing program
                         print(serial.Serial.get_settings(ser))
                         print(ser.readline())
-                        ser.write(b"G28")
+                        ser.write(b'''G92 E0
+G28
+''')
                         for line in gfile:
                                 gcode=bytes(gfile.readline(), 'utf-8')
                                 ser.write(gcode)
                         print(ser.readline())
-                        ser.write(b"G28")
+                        ser.write(b'''G92 E0
+G28
+''')
                         ser.close()
                         gfile.close()
                         print("sweep bed")
@@ -245,7 +249,9 @@ class Application(Frame):
                 ser=serial.Serial(conPorts[n],115200,timeout=1) #(port, baudrate, timeout
                 print(serial.Serial.get_settings(ser))
                 print(ser.readline())
-                ser.write(b"G28") #This test might not work for all printers,works for bukito
+                ser.write(b'''G92 E0
+G28
+''') #Homes printer, should work for all printers
                 print(ser.readline())
                 ser.close()
                 n+=1 

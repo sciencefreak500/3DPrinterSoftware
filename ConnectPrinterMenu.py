@@ -20,6 +20,10 @@ def Main():
 			self.label.pack()
 		# Create IntVar objects to use with
 		# the Checkbuttons.
+			self.cb_var0 = tkinter.IntVar()
+			self.cb_var0.set(0)
+			self.cb0 = tkinter.Checkbutton(self.top_frame, text='Bukito', variable=self.cb_var0,command=self.fcb0)
+			self.cb0.pack()
 			self.connect_button = tkinter.Button(self.bottom_frame,text='Connect',command=self.show_choice)
 			self.notFound_button = tkinter.Button(self.bottom_frame, text='Printer not Displayed')
 			self.notFound_button["command"] = self.secConFunct
@@ -37,8 +41,14 @@ def Main():
 		def secConFunct(self):
 			print("Secondary connection functionality")
 		# The show_choice method is the callback function for the connect button.
+		def fcb0(self):
+			if self.cb_var0.get()==0:
+				self.cb_var0.set(1)
+			else:
+				self.cb_var0.set(0)
 		def show_choice(self):
 			Printers=[]
+			Printers.append(str(self.cb_var0.get()))
 			with open('setup.inf','wb') as f:
 				pickle.dump([Printers], f)
 			self.main_window.quit()
