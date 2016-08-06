@@ -23,7 +23,6 @@ import AddQueueMenuCreator
 
 ## non-native ##
 
-import usb #Hasn't been used yet, isn't needed for ubuntu
 import serial
 
 ####### SCRIPT VARIABLES #######
