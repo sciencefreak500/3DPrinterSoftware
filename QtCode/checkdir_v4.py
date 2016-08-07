@@ -12,15 +12,12 @@ is stored in the list, and you can modify this array as you see fit.
 
 ####### IMPORTS #######
 
-from tkinter import filedialog
-from tkinter import *
+
 import subprocess
 import sys
 import pickle
 import os.path
-import ConnectPrinterMenuOptionCreator
-import AddQueueMenuCreator
-
+import PrintProgramUI as gui
 ## non-native ##
 
 import serial
@@ -29,31 +26,31 @@ import serial.tools.list_ports as listports
 ####### SCRIPT VARIABLES #######
 
 CurrentQueue = []
-ArchivedQueue = []
 
 firstRun="0"
 sending="0"
 conPrinters=[]
 
 #Add on to the devices by adding to the list in the categories. make sure the element index is the same, the devide and vendor id's are in decimal
-Printers = {'DeviceName':["Ultimaker2","Bukito"], 'ID': ["2341:0042","5824:1155",]}
+Printers = {'DeviceName':["Ultimaker2","Bukito"],
+            'Shortname': ["Ult2","Buk"],
+            'ID': ["2341:0042","5824:1155",]}
 
 
 ####### FUNCTIONS #######
 
 def SaveState():
     global CurrentQueue
-    global ArchivedQueue
     with open('setup.inf','wb') as f:
-        pickle.dump([CurrentQueue, ArchivedQueue], f)
+        pickle.dump([CurrentQueue], f)
 
 
 def InitializeProgram():
     global CurrentQueue
-    global ArchivedQueue
     try:
         with open('setup.inf','rb') as f:
-            CurrentQueue, ArchivedQueue = pickle.load(f)
+            CurrentQueue = pickle.load(f)
+            print (CurrentQueue)
     except:
             file = open('setup.inf','wb')
             file.close()
@@ -62,21 +59,21 @@ def InitializeProgram():
 #going to need to find another lib for this one, something cross platform
 def GetUSB():
         global Printers
-        Ports=[]
-        Names=[]
-        DeviceName=Printers['DeviceName']
-        ID=Printers['ID']
+        Ports = []
+        Names = []
+        DeviceName = Printers['DeviceName']
+        ID = Printers['ID']
         device = listports.comports()
         for i in device:
-                vid=str(i.vid)
-                pid=str(i.pid)
-                PortID=str(vid+":"+pid)
+                vid = str(i.vid)
+                pid = str(i.pid)
+                PortID = str(vid + ":" + pid)
                 for n, x in enumerate(ID):
-                        if str(x)==str(PortID):
-                                Path=str(i.device)
+                        if str(x) == str(PortID):
+                                Path = str(i.device)
                                 Ports.append(Path)
                                 Names.append(DeviceName[n])
-        PortsnNames=[Ports,Names]
+        PortsnNames = [Ports,Names]
         print(PortsnNames)
         return PortsnNames #this is the path to the printer
 
@@ -88,22 +85,22 @@ def GetUSB():
 
 def loadList(self):
     for i in CurrentQueue:
-        x=i[0]
-        y=str(str(x['Name'])+" "*5+str(x['Printers'])+" "*5+str(x['Number']))
-        self.QueueList.insert(END,y)
+        x = i[0]
+        y = str(str(x['Name'])+" " * 5 + str(x['Printers']) + " " * 5 +str(x['Number']))
+        #self.QueueList.insert(END,y)
 
 def AddToQueue(self):
     with open('setup.inf','wb') as f:
-                pickle.dump([conPrinters], f)
+        pickle.dump([conPrinters], f)
     AddQueueMenuCreator.Main()
     with open('setup.inf','rb') as f:
-            QueueAddition=pickle.load(f)
-    if str(QueueAddition)!="[[]]":
-            CurrentQueue.append(QueueAddition)
-            x=QueueAddition[0]
-            y=str(str(x['Name'])+" "*5+str(x['Printers'])+" "*5+str(x['Number']))
-            self.QueueList.insert(END,y)
-            SaveState()
+        QueueAddition=pickle.load(f)
+    if str(QueueAddition) != "[[]]":
+        CurrentQueue.append(QueueAddition)
+        x=QueueAddition[0]
+        y=str(str(x['Name']) + " " * 5 + str(x['Printers']) + " " * 5 + str(x['Number']))
+        self.QueueList.insert(END,y)
+        SaveState()
     
 def RemoveFromQueue(self):
     index = self.QueueList.index(ACTIVE)
@@ -112,6 +109,7 @@ def RemoveFromQueue(self):
     CurrentQueue.remove(None)
     SaveState()
 
+'''
 def MakeNormal(self):
     root.wm_state('normal')
 
@@ -119,27 +117,28 @@ def PushBackground(self):
     print ("minimizing")
     root.wm_state('withdrawn')
     self.after(5000,self.MakeNormal)
+'''
 
 def SendToPrinter(self):
     global CurrentQueue
     global sending
-    if sending=="0":
-        sending="1"
-        self.printqueueText.set("Stop Printing Queue")
+    if sending == "0":
+        sending = "1"
+        #self.printqueueText.set("Stop Printing Queue")
         while str(CurrentQueue)!='[]':
-            sub=CurrentQueue[0]
-            x=sub[0]
+            sub = CurrentQueue[0]
+            x = sub[0]
             while 0 < x['Number']:
                 self.QueueList.itemconfig(0,{'bg':'yellow'})
-                x['Number']=int(x['Number'])-1
-                sub[0]=x
-                CurrentQueue[0]=sub
+                x['Number'] = int(x['Number']) - 1
+                sub[0] = x
+                CurrentQueue[0] = sub
                 self.QueueList.delete(0)
                 if x['Number']>0:
-                    y=str(str(x['Name'])+" "*5+str(x['Printers'])+" "*5+str(x['Number']))
+                    y = str(str(x['Name'])+" " * 5 + str(x['Printers']) + " " * 5 + str(x['Number']))
                     self.QueueList.insert(0,y)
-                    gfile=open(x['Path'])
-                    ser=serial.Serial(conPorts[0],250000,timeout=1) #(port, baudrate, timeout) needs to be able to handle more than one printer, also needs to stopgrabbing program
+                    gfile = open(x['Path'])
+                    ser = serial.Serial(conPorts[0],250000,timeout=1) #(port, baudrate, timeout) needs to be able to handle more than one printer, also needs to stopgrabbing program
                     print(serial.Serial.get_settings(ser))
                     print(ser.readline())
                     ser.write(b'''G92 E0
@@ -157,7 +156,7 @@ G28''')
             print("passing next item")
             CurrentQueue.pop(0)
     else:
-        sending="0"
+        sending = "0"
         self.printqueueText.set("Print Queue")
         self.QueueList.itemconfig(0,{'bg':'white'})
         print("pause queue")
@@ -249,7 +248,7 @@ G28''') #Homes printer, should work for all printers
         conPorts=[]
         self.connectPrinterText.set("Connect Printer")
         self.connectPrinterLabel.set("")
-
+'''
 def createWidgets(self):
     self.background = Button(self)
     self.background["text"] = "Push To Background",
@@ -306,12 +305,15 @@ def createWidgets(self):
  
 def __init__(self, master=None):
     self.CompareList = []
+
     Frame.__init__(self, master)
     self.grid()
     self.createWidgets()
     self.loadList()
 
- 
+
+
+
 root = Tk()
 entry = Entry()
 def handle(event):
@@ -325,4 +327,9 @@ try:
 except:
     SaveState()
 
+'''
 InitializeProgram()
+
+SaveState()
+
+print (CurrentQueue)
