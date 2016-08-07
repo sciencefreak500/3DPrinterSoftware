@@ -17,13 +17,10 @@ from tkinter import *
 import subprocess
 import sys
 import pickle
-<<<<<<< HEAD
-import ConnectPrinterMenuOptionCreator
-import AddQueueMenuCreator
-=======
-import MultiPrinterMenuOptionCreator
-import PrintProgramUI as gui
->>>>>>> 3793699fb5590af91d5525912afff6ba820a83f0
+#import ConnectPrinterMenuOptionCreator
+#import AddQueueMenuCreator
+#import MultiPrinterMenuOptionCreator
+import example_ui as gui
 
 ####### SCRIPT VARIABLES #######
 
@@ -106,143 +103,143 @@ InitializeProgram()
 
 
 
-<<<<<<< HEAD
-    def AddToQueue(self):
+
+def AddToQueue(self):
+    with open('setup.inf','wb') as f:
+                pickle.dump([conPrinters], f)
+    AddQueueMenuCreator.Main()
+    #with open('setup.inf','rb') as f:
+    #        QueueAddition=pickle.load(f)
+    filepath = filedialog.askopenfilename()
+    fileName = filepath.split('/')[-1]
+    QueueAddition = {'Name': fileName, 'Path': filepath}
+    CurrentQueue.append(QueueAddition)
+    self.QueueList.insert(END,fileName)
+    SaveState()
+
+def RemoveFromQueue(self):
+    index = self.QueueList.index(ACTIVE)
+    self.QueueList.delete(index)
+    CurrentQueue[index] = None
+    CurrentQueue.remove(None)
+    SaveState()
+    print(CurrentQueue)
+
+def MakeNormal(self):
+    root.wm_state('normal')
+
+def PushBackground(self):
+    print ("minimizing")
+    root.wm_state('withdrawn')
+    self.after(5000,self.MakeNormal)
+
+def SendToPrinter(self):
+    global CurrentQueue
+    global sending
+    if sending=="0":
+        sending="1"
+        while str(CurrentQueue)!='[]':
+            sub=CurrentQueue[0]
+            x=sub[0]
+            while 0 < x['Number']:
+                self.QueueList.itemconfig(0,{'bg':'yellow'})
+                x['Number']=int(x['Number'])-1
+                sub[0]=x
+                CurrentQueue[0]=sub
+                self.QueueList.delete(0)
+                if x['Number']>0:
+                    y=str(str(x['Name'])+" "*5+str(x['Printers'])+" "*5+str(x['Number']))
+                    self.QueueList.insert(0,y)
+                    time.sleep(0.5) #just to be able to check functionality
+                    print("Printing")
+                SaveState()
+            print("passing next item")
+            CurrentQueue.pop(0)
+    else:
+        sending="0"
+        self.QueueList.itemconfig(0,{'bg':'white'})
+        print("pause queue")
+
+def MoveUp(self):
+    l = self.QueueList
+    try:
+        pos = list(l.curselection())[0]
+    except:
+        return
+    if pos == 0:
+        print ("is zero")
+        return
+    text = l.get(pos)
+    l.delete(pos)
+    l.insert(pos-1, text)
+    l.selection_set(pos-1)
+
+    a = CurrentQueue[pos]
+    b = CurrentQueue[pos-1]
+    CurrentQueue[pos] = b
+    CurrentQueue[pos-1] = a
+    SaveState()
+    print(CurrentQueue)
+
+def MoveDown(self):
+    l = self.QueueList
+    try:
+        pos = list(l.curselection())[0]
+    except:
+        return
+    if pos == len(l.get(0, END))-1:
+        print ("is end")
+        return
+    text = l.get(pos)
+    l.delete(pos)
+    l.insert(pos+1, text)
+    l.selection_set(pos+1)
+
+    a = CurrentQueue[pos]
+    b = CurrentQueue[pos+1]
+    CurrentQueue[pos] = b
+    CurrentQueue[pos+1] = a
+    SaveState()
+    print(CurrentQueue)
+
+
+ #once again, going to need to find another lib for this.
+def ConnectToPrinter(self):
+    global firstRun
+    if firstRun=="0":
+        PortsnNames=GetUSB()
+        Ports=PortsnNames[0]
+        Names=PortsnNames[1]
         with open('setup.inf','wb') as f:
-                    pickle.dump([conPrinters], f)
-        AddQueueMenuCreator.Main()
-        #with open('setup.inf','rb') as f:
-        #        QueueAddition=pickle.load(f)
-        filepath = filedialog.askopenfilename()
-        fileName = filepath.split('/')[-1]
-        QueueAddition = {'Name': fileName, 'Path': filepath}
-        CurrentQueue.append(QueueAddition)
-        self.QueueList.insert(END,fileName)
-        SaveState()
-    
-    def RemoveFromQueue(self):
-        index = self.QueueList.index(ACTIVE)
-        self.QueueList.delete(index)
-        CurrentQueue[index] = None
-        CurrentQueue.remove(None)
-        SaveState()
-        print(CurrentQueue)
-
-    def MakeNormal(self):
-        root.wm_state('normal')
-
-    def PushBackground(self):
-        print ("minimizing")
-        root.wm_state('withdrawn')
-        self.after(5000,self.MakeNormal)
-
-    def SendToPrinter(self):
-        global CurrentQueue
-        global sending
-        if sending=="0":
-            sending="1"
-            while str(CurrentQueue)!='[]':
-                sub=CurrentQueue[0]
-                x=sub[0]
-                while 0 < x['Number']:
-                    self.QueueList.itemconfig(0,{'bg':'yellow'})
-                    x['Number']=int(x['Number'])-1
-                    sub[0]=x
-                    CurrentQueue[0]=sub
-                    self.QueueList.delete(0)
-                    if x['Number']>0:
-                        y=str(str(x['Name'])+" "*5+str(x['Printers'])+" "*5+str(x['Number']))
-                        self.QueueList.insert(0,y)
-                        time.sleep(0.5) #just to be able to check functionality
-                        print("Printing")
-                    SaveState()
-                print("passing next item")
-                CurrentQueue.pop(0)
+                pickle.dump([Names], f)
+        ConnectPrinterMenuOptionCreator.Main()
+        with open('setup.inf','rb') as f:
+            Printers=pickle.load(f)
+        if Names==[]:
+            self.connectPrinterLabel.set("No Printer was Found")
         else:
-            sending="0"
-            self.QueueList.itemconfig(0,{'bg':'white'})
-            print("pause queue")
-
-    def MoveUp(self):
-        l = self.QueueList
-        try:
-            pos = list(l.curselection())[0]
-        except:
-            return
-        if pos == 0:
-            print ("is zero")
-            return
-        text = l.get(pos)
-        l.delete(pos)
-        l.insert(pos-1, text)
-        l.selection_set(pos-1)
-
-        a = CurrentQueue[pos]
-        b = CurrentQueue[pos-1]
-        CurrentQueue[pos] = b
-        CurrentQueue[pos-1] = a
-        SaveState()
-        print(CurrentQueue)
-
-    def MoveDown(self):
-        l = self.QueueList
-        try:
-            pos = list(l.curselection())[0]
-        except:
-            return
-        if pos == len(l.get(0, END))-1:
-            print ("is end")
-            return
-        text = l.get(pos)
-        l.delete(pos)
-        l.insert(pos+1, text)
-        l.selection_set(pos+1)
-
-        a = CurrentQueue[pos]
-        b = CurrentQueue[pos+1]
-        CurrentQueue[pos] = b
-        CurrentQueue[pos+1] = a
-        SaveState()
-        print(CurrentQueue)
-
-
-     #once again, going to need to find another lib for this.
-    def ConnectToPrinter(self):
-        global firstRun
-        if firstRun=="0":
-            PortsnNames=GetUSB()
-            Ports=PortsnNames[0]
-            Names=PortsnNames[1]
-            with open('setup.inf','wb') as f:
-                    pickle.dump([Names], f)
-            ConnectPrinterMenuOptionCreator.Main()
-            with open('setup.inf','rb') as f:
-                Printers=pickle.load(f)
-            if Names==[]:
-                self.connectPrinterLabel.set("No Printer was Found")
-            else:
-                firstRun="1"
-                conPrinters=[]
-                conPorts=[]
-                n=0
-                while n<len(Names):
-                    if str(Printers[n])=="['1']":
-                        conPrinters.append(Names[n])
-                        conPorts.append(Ports[n])
-                    n+=1
-                if str(conPorts)=='[]':
-                    self.connectPrinterLabel.set("No Printer was Selected")
-                    firstRun="0"
-                else:
-                    self.connectPrinterText.set("Disconnect Printer")
-                    self.connectPrinterLabel.set("Connected to "+str(conPrinters))
+            firstRun="1"
+            conPrinters=[]
+            conPorts=[]
             n=0
-            while n<len(conPorts) and conPorts[0]!='[]':
-                with open(conPorts[n],"rb") as f:
-                    data=f.read()
-                print (data) 
-                n+=1 
-=======
+            while n<len(Names):
+                if str(Printers[n])=="['1']":
+                    conPrinters.append(Names[n])
+                    conPorts.append(Ports[n])
+                n+=1
+            if str(conPorts)=='[]':
+                self.connectPrinterLabel.set("No Printer was Selected")
+                firstRun="0"
+            else:
+                self.connectPrinterText.set("Disconnect Printer")
+                self.connectPrinterLabel.set("Connected to "+str(conPrinters))
+        n=0
+        while n<len(conPorts) and conPorts[0]!='[]':
+            with open(conPorts[n],"rb") as f:
+                data=f.read()
+            print (data) 
+            n+=1 
+
 def loadList():
     print (CurrentQueue)
     for i in CurrentQueue:
@@ -400,8 +397,6 @@ try:
 except:
     SaveState()
     print ("closed")
-<<<<<<< HEAD
 
-=======
 '''
->>>>>>> 3793699fb5590af91d5525912afff6ba820a83f0
+

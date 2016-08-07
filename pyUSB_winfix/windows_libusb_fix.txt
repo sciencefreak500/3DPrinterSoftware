@@ -1,1 +1,0 @@
-for my computer, placed dll for 64bit in system32, and 32bit in sysWow64, then placed the lib for 64 in python libs folder. Just werks.
