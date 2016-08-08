@@ -27,14 +27,20 @@ import serial.tools.list_ports as listports
 
 CurrentQueue = []
 
-firstRun="0"
-sending="0"
-conPrinters=[]
+# CurrentQueue structure:
+#		 Device Name, Number of prints, [list of printers connected]
+
+#its better to use bool than int. True/False 
+firstRun = False
+sending = False
+conPrinters = []
+
 
 #Add on to the devices by adding to the list in the categories. make sure the element index is the same, the devide and vendor id's are in decimal
 Printers = {'DeviceName':["Ultimaker2","Bukito"],
             'Shortname': ["Ult2","Buk"],
-            'ID': ["2341:0042","5824:1155",]}
+            'ID': ["2341:0042","5824:1155",]
+			}
 
 
 ####### FUNCTIONS #######
@@ -56,7 +62,7 @@ def InitializeProgram():
             file.close()
     
                 
-#going to need to find another lib for this one, something cross platform
+# gets devices from pyserial by vidpid, pumps to ConnectToPrinter 
 def GetUSB():
         global Printers
         Ports = []
@@ -67,19 +73,15 @@ def GetUSB():
         for i in device:
                 vid = str(i.vid)
                 pid = str(i.pid)
-                PortID = str(vid + ":" + pid)
+                PortID = vid + ":" + pid
                 for n, x in enumerate(ID):
-                        if str(x) == str(PortID):
+                        if x == PortID:
                                 Path = str(i.device)
                                 Ports.append(Path)
                                 Names.append(DeviceName[n])
         PortsnNames = [Ports,Names]
-        print(PortsnNames)
         return PortsnNames #this is the path to the printer
-
-
-####### MAIN SCRIPT #######
-
+		#sends out comports, and Names in PortsnNames
 
 
 
@@ -87,7 +89,7 @@ def loadList(self):
     for i in CurrentQueue:
         x = i[0]
         y = str(str(x['Name'])+" " * 5 + str(x['Printers']) + " " * 5 +str(x['Number']))
-        #self.QueueList.insert(END,y)
+        
 
 def AddToQueue(self):
     with open('setup.inf','wb') as f:
@@ -95,11 +97,9 @@ def AddToQueue(self):
     AddQueueMenuCreator.Main()
     with open('setup.inf','rb') as f:
         QueueAddition=pickle.load(f)
-    if str(QueueAddition) != "[[]]":
+		#QueueAddition = {'Name': fileName, 'Path': filepath, 'Printers': printers, 'Number': number}
         CurrentQueue.append(QueueAddition)
-        x=QueueAddition[0]
-        y=str(str(x['Name']) + " " * 5 + str(x['Printers']) + " " * 5 + str(x['Number']))
-        self.QueueList.insert(END,y)
+        #let Qt know of our structure
         SaveState()
     
 def RemoveFromQueue(self):
@@ -108,36 +108,29 @@ def RemoveFromQueue(self):
     CurrentQueue[index] = None
     CurrentQueue.remove(None)
     SaveState()
-
-'''
-def MakeNormal(self):
-    root.wm_state('normal')
-
-def PushBackground(self):
-    print ("minimizing")
-    root.wm_state('withdrawn')
-    self.after(5000,self.MakeNormal)
-'''
-
+	
+	
+#THE ACUAL PRINT FUNCTION
 def SendToPrinter(self):
     global CurrentQueue
     global sending
-    if sending == "0":
-        sending = "1"
+    if sending == False:
+        sending = True
         #self.printqueueText.set("Stop Printing Queue")
         while str(CurrentQueue)!='[]':
             sub = CurrentQueue[0]
             x = sub[0]
             while 0 < x['Number']:
-                self.QueueList.itemconfig(0,{'bg':'yellow'})
+                #while loop is for counting for number of prints - backwards
                 x['Number'] = int(x['Number']) - 1
                 sub[0] = x
                 CurrentQueue[0] = sub
                 self.QueueList.delete(0)
                 if x['Number']>0:
-                    y = str(str(x['Name'])+" " * 5 + str(x['Printers']) + " " * 5 + str(x['Number']))
+                    y = str(str(x['Name'])+" " * 5 + str(x['Printers']) + " " * 5 + str(x['Number']))  #format for tkinter
                     self.QueueList.insert(0,y)
                     gfile = open(x['Path'])
+					#actual connection to serial below
                     ser = serial.Serial(conPorts[0],250000,timeout=1) #(port, baudrate, timeout) needs to be able to handle more than one printer, also needs to stopgrabbing program
                     print(serial.Serial.get_settings(ser))
                     print(ser.readline())
@@ -146,21 +139,22 @@ G28''')
                     for line in gfile:
                             gcode=bytes(gfile.readline(), 'utf-8')
                             ser.write(gcode)
-                    print(ser.readline())
+                    print(ser.readline())  #home key
                     ser.write(b'''G92 E0
 G28''')
                     ser.close()
                     gfile.close()
                     print("sweep bed")
                 SaveState()
-            print("passing next item")
-            CurrentQueue.pop(0)
+            print("passing next item")   #repeat the while loop 
+            CurrentQueue.pop(0) #get rid of first item,
     else:
-        sending = "0"
+        sending = False
         self.printqueueText.set("Print Queue")
-        self.QueueList.itemconfig(0,{'bg':'white'})
+        self.QueueList.itemconfig(0,{'bg':'white'})  #done printing or didnt do anything
         print("pause queue")
 
+		
 def MoveUp(self):
     l = self.QueueList
     try:
@@ -199,13 +193,13 @@ def MoveDown(self):
     CurrentQueue[pos+1] = a
     SaveState()
 
-
+#get printer connection
 def ConnectToPrinter(self):
     global conPorts
     global firstRun
-    if firstRun=="0":
-        PortsnNames=GetUSB()
-        Ports=PortsnNames[0]
+    if firstRun == False:
+        PortsnNames = GetUSB()
+        Ports = PortsnNames[0]  #get serial to connect with  0 is ports, 1 is names
         Names=PortsnNames[1]
         with open('setup.inf','wb') as f:
                 pickle.dump([Names], f)
@@ -213,21 +207,21 @@ def ConnectToPrinter(self):
         with open('setup.inf','rb') as f:
             Printers=pickle.load(f)
         if Names==[]:
-            self.connectPrinterLabel.set("No Printer was Found")
+            self.connectPrinterLabel.set("No Printer was Found") #no names were found in pyserial.comports
         else:
-            firstRun="1"
+            firstRun = True
             conPorts=[]
             Printers=Printers[0]
-            n=0
+            n= 0 
             while n<len(Names):
                 global conPrinters
                 if str(Printers[n])=='1':
-                    conPrinters.append(Names[n])
+                    conPrinters.append(Names[n])  #if connected, put this in the list of connected printers
                     conPorts.append(Ports[n])
                 n+=1
             if str(conPorts)=='[]':
                 self.connectPrinterLabel.set("No Printer was Selected")
-                firstRun="0"
+                firstRun = False
             else:
                 self.connectPrinterText.set("Disconnect Printer")
                 self.connectPrinterLabel.set("Connected to "+str(conPrinters))
@@ -243,7 +237,7 @@ G28''') #Homes printer, should work for all printers
             n+=1 
     else:
         print("pause queue") 
-        firstRun="0"
+        firstRun = False
         conPrinters=[]
         conPorts=[]
         self.connectPrinterText.set("Connect Printer")
