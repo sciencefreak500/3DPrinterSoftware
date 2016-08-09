@@ -18,6 +18,8 @@ import sys
 import pickle
 import os.path
 import PrintProgramUI as gui
+import AddToQueue as queueDialog
+import ConnectToPrinter as connectDialog
 ## non-native ##
 
 import serial
@@ -34,6 +36,8 @@ CurrentQueue = []
 firstRun = False
 sending = False
 conPrinters = []
+filepath = ""
+printnumbers = ""
 
 
 #Add on to the devices by adding to the list in the categories. make sure the element index is the same, the devide and vendor id's are in decimal
@@ -91,7 +95,17 @@ def loadList(self):
         y = str(str(x['Name'])+" " * 5 + str(x['Printers']) + " " * 5 +str(x['Number']))
         
 
-def AddToQueue(self):
+def AddToQueue():
+    global printnumber
+    global filepath
+    QueueDialog.show()
+    printnumber = "1"
+    QueueUI.PrintNumEdit.setText(printnumber)
+    filepath = "..."
+    QueueUI.lbl_FileName.setText(filepath)
+    
+    
+    '''
     with open('setup.inf','wb') as f:
         pickle.dump([conPrinters], f)
     AddQueueMenuCreator.Main()
@@ -101,12 +115,14 @@ def AddToQueue(self):
         CurrentQueue.append(QueueAddition)
         #let Qt know of our structure
         SaveState()
+    '''
     
-def RemoveFromQueue(self):
-    index = self.QueueList.index(ACTIVE)
-    self.QueueList.delete(index)
-    CurrentQueue[index] = None
-    CurrentQueue.remove(None)
+def RemoveFromQueue():
+    print("remove from queue")
+    #index = self.QueueList.index(ACTIVE)
+    #self.QueueList.delete(index)
+    #CurrentQueue[index] = None
+    #CurrentQueue.remove(None)
     SaveState()
 	
 	
@@ -155,8 +171,8 @@ G28''')
         print("pause queue")
 
 		
-def MoveUp(self):
-    l = self.QueueList
+def MoveUp():
+    '''l = self.QueueList
     try:
         pos = list(l.curselection())[0]
     except:
@@ -171,11 +187,12 @@ def MoveUp(self):
     a = CurrentQueue[pos]
     b = CurrentQueue[pos-1]
     CurrentQueue[pos] = b
-    CurrentQueue[pos-1] = a
+    CurrentQueue[pos-1] = a'''
+    print("move up")
     SaveState()
 
-def MoveDown(self):
-    l = self.QueueList
+def MoveDown():
+    '''l = self.QueueList
     try:
         pos = list(l.curselection())[0]
     except:
@@ -190,11 +207,16 @@ def MoveDown(self):
     a = CurrentQueue[pos]
     b = CurrentQueue[pos+1]
     CurrentQueue[pos] = b
-    CurrentQueue[pos+1] = a
+    CurrentQueue[pos+1] = a'''
+    print("move down")
     SaveState()
 
 #get printer connection
+def ConPrint():
+    ConnectDialog.show()
+    
 def ConnectToPrinter(self):
+    
     global conPorts
     global firstRun
     if firstRun == False:
@@ -243,59 +265,6 @@ G28''') #Homes printer, should work for all printers
         self.connectPrinterText.set("Connect Printer")
         self.connectPrinterLabel.set("")
 '''
-def createWidgets(self):
-    self.background = Button(self)
-    self.background["text"] = "Push To Background",
-    self.background["command"] = self.PushBackground
-    self.background.grid(row=0,column=0, sticky = W)
-
-    self.printqueueText=StringVar()
-    self.printqueueText.set("Print Queue")
-    self.printqueue = Button(self)
-    self.printqueue["textvariable"] = self.printqueueText,
-    self.printqueue["command"] = self.SendToPrinter
-    self.printqueue.grid(row=0,column=1, sticky = E)
-
-    self.updownframe = Frame(self, height = 50, width = 50)
-    self.updownframe.grid(row=1,column=1, sticky = E)
-
-    self.addqueue = Button(self)
-    self.addqueue["text"] = "Add to Queue",
-    self.addqueue["command"] = self.AddToQueue
-    self.addqueue.grid(row=0,column=2, sticky = E)
-
-    self.removequeue = Button(self)
-    self.removequeue["text"] = "Remove From Queue",
-    self.removequeue["command"] = self.RemoveFromQueue
-    self.removequeue.grid(row=0,column=3, sticky = E)  
-
-    self.connectPrinterLabel=StringVar()
-    self.connectprinterlabel=Label(self,textvariable=self.connectPrinterLabel)
-    self.connectprinterlabel.grid(row=2,column=2, sticky = E)
-	
-    self.connectPrinterText=StringVar()
-    self.connectPrinterText.set("Connect Printer")
-    self.connectprinter = Button(self)
-    self.connectprinter["textvariable"] = self.connectPrinterText,
-    self.connectprinter["command"] = self.ConnectToPrinter
-    self.connectprinter.grid(row=1,column=2, sticky = E)
-
-    self.moveup = Button(self.updownframe)
-    self.moveup["text"] = u'\u25b2'
-    self.moveup["command"] = self.MoveUp
-    self.moveup.grid(row=1,column=1, sticky = E)
-
-    self.movedown = Button(self.updownframe)
-    self.movedown["text"] = u'\u25bc'
-    self.movedown["command"] = self.MoveDown
-    self.movedown.grid(row=2,column=1, sticky = E)
-
-    self.QueueList = Listbox(self)
-    self.QueueList.grid(row=1,column=0, columnspan = 2, pady = 10)
-
-    self.printingLabel=StringVar()
-    self.printinglabel=Label(self,textvariable=self.printingLabel)
-    self.printinglabel.grid(row=2,column=2, sticky = E)
  
 def __init__(self, master=None):
     self.CompareList = []
@@ -322,8 +291,142 @@ except:
     SaveState()
 
 '''
-InitializeProgram()
 
-SaveState()
+def EndProgram():
+    sys.exit(app.exec_())
 
-print (CurrentQueue)
+
+
+def test():
+    print("functionality")
+
+def ButtonEnable():
+    pass
+
+def FileDialogBox():
+    global filepath
+    filepath = "..."
+    filepath = queueDialog.QtGui.QFileDialog.getOpenFileName(None,"Choose File")
+    if filepath == "":
+        filepath = "..."
+        QueueUI.lbl_FileName.setText(filepath)
+    else:
+        QueueUI.lbl_FileName.setText(filepath.split("/")[-1])
+        print(filepath)
+
+
+
+def CheckItemNumberEntry():
+    global printnumber
+    printnumber = "1"
+    try:
+        tempnumber = int(QueueUI.PrintNumEdit.text())
+        printnumber = str(tempnumber)
+    except:
+        if QueueUI.PrintNumEdit.text() == "":
+            pass
+        else:
+            msg = queueDialog.QtGui.QMessageBox()
+            msg.setText("This entry should only contain numbers. Please enter print number again.")
+            msg.setWindowTitle("Entry Incorrect")
+            msg.exec_()
+        printnumber = "1"
+
+
+
+def VerifyAddItemEntry():
+    global filepath
+    global printnumber
+    global CurrentQueue
+    error = False
+    if filepath == "...":
+        error = True
+
+    if error == True:
+        msg = queueDialog.QtGui.QMessageBox()
+        msg.setText("Required entries are not complete. Please correct this and try again.")
+        msg.setWindowTitle("Entry Incorrect")
+        msg.exec_()
+        
+        AddToQueue()
+
+    else:
+        #print(filepath, printnumber)
+        tempdict = {'Name':filepath.split('/')[-1], 'Path':filepath, 'Number':printnumber}
+        CurrentQueue.append(tempdict)
+        pumpstring = tempdict['Name'] + " | " + tempdict['Number']
+        ui.list_PrintQueue.addItem(pumpstring)
+        
+
+        
+
+def FunctionGuiMap():
+
+    #printer list: listPrinterList
+    #queue list: list_PrintQueue
+
+        
+    '''GuiButtons'''
+    #MainWindow
+    ui.btn_MoveDown.clicked.connect(MoveDown)
+    ui.btn_MoveUp.clicked.connect(MoveUp)
+    ui.btn_Connect.clicked.connect(ConPrint)
+    ui.btn_Disconnect.clicked.connect(test)
+    ui.btn_addItem.clicked.connect(AddToQueue)   #important
+    ui.btn_clearList.clicked.connect(test)
+    ui.btn_Print.clicked.connect(test)
+
+    QueueUI.btn_FileDialog.clicked.connect(FileDialogBox)
+    QueueUI.checkBox.clicked.connect(test)
+    QueueUI.PrintNumEdit.textChanged.connect(CheckItemNumberEntry)
+    QueueUI.buttonBox.accepted.connect(VerifyAddItemEntry)
+
+   
+
+    ''' MenuBar'''
+    #MainWindow
+    ui.actionMove_Selected_Down_2.triggered.connect(MoveDown)
+    ui.actionMove_Selected_Up.triggered.connect(MoveUp)
+    ui.actionRemove_Selected_Item.triggered.connect(RemoveFromQueue)
+    ui.actionExit.triggered.connect(EndProgram)
+    ui.actionAdd_Item.triggered.connect(AddToQueue)    #important
+    ui.actionRemove_Selected_Item.triggered.connect(test)
+    ui.actionDisconnect_Selected.triggered.connect(test)
+    ui.actionConnect.triggered.connect(ConPrint)
+    ui.actionClear_List.triggered.connect(test)
+    ui.actionPrint.triggered.connect(test)
+    ui.actionEdit_Item_Properties.triggered.connect(test)
+    ui.actionMove_Selected.triggered.connect(test)
+    ui.actionPreferences.triggered.connect(test)
+    ui.actionConfigure.triggered.connect(test)
+    ui.actionAbout.triggered.connect(test)
+    ui.actionDocumentation.triggered.connect(test)
+
+    
+    
+def SetupDialogs():
+    global QueueDialog
+    global ConnectDialog
+    global QueueUI
+    global ConnectUI
+    QueueDialog = queueDialog.QtGui.QDialog()
+    QueueUI = queueDialog.Ui_Dialog()
+    QueueUI.setupUi(QueueDialog)
+
+    ConnectDialog = connectDialog.QtGui.QDialog()
+    ConnectUI = connectDialog.Ui_Dialog()
+    ConnectUI.setupUi(ConnectDialog)
+
+
+#the main program
+if __name__ == "__main__":
+    app = gui.QtGui.QApplication(sys.argv)
+    window = gui.QtGui.QMainWindow()
+    ui = gui.Ui_MainWindow()
+    ui.setupUi(window)
+    SetupDialogs()
+    FunctionGuiMap()
+    window.show()
+    sys.exit(app.exec_())
+
+
