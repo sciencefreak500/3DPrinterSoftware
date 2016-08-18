@@ -10,12 +10,26 @@ is stored in the list, and you can modify this array as you see fit.
 
 
 
+'''
+<<<<<CHRIS>>>>>
+
+Just a note, right now, the ConnectToPrinter function does not work because
+This is what I am currently working on. You may have to pyuic4 the ConnectToPrinter.ui
+file. Type this into terminal:
+
+pyuic4 ConnectToPrinter.ui -o ConnectToPrinter.py
+
+if it gives you trouble. Good luck! Have fun!
+
+'''
+
 ####### IMPORTS #######
 
 
 import subprocess
 import sys
 import pickle
+
 import os.path
 import PrintProgramUI as gui
 import AddToQueue as queueDialog
@@ -83,8 +97,7 @@ def GetUSB():
                                 Path = str(i.device)
                                 Ports.append(Path)
                                 Names.append(DeviceName[n])
-        PortsnNames = [Ports,Names]
-        return PortsnNames #this is the path to the printer
+        return Ports, Names #this is the path to the printer
 		#sends out comports, and Names in PortsnNames
 
 
@@ -95,27 +108,8 @@ def loadList(self):
         y = str(str(x['Name'])+" " * 5 + str(x['Printers']) + " " * 5 +str(x['Number']))
         
 
-def AddToQueue():
-    global printnumber
-    global filepath
-    QueueDialog.show()
-    printnumber = "1"
-    QueueUI.PrintNumEdit.setText(printnumber)
-    filepath = "..."
-    QueueUI.lbl_FileName.setText(filepath)
-    
-    
-    '''
-    with open('setup.inf','wb') as f:
-        pickle.dump([conPrinters], f)
-    AddQueueMenuCreator.Main()
-    with open('setup.inf','rb') as f:
-        QueueAddition=pickle.load(f)
-		#QueueAddition = {'Name': fileName, 'Path': filepath, 'Printers': printers, 'Number': number}
-        CurrentQueue.append(QueueAddition)
-        #let Qt know of our structure
-        SaveState()
-    '''
+
+
     
 def RemoveFromQueue():
     print("remove from queue")
@@ -220,9 +214,7 @@ def ConnectToPrinter(self):
     global conPorts
     global firstRun
     if firstRun == False:
-        PortsnNames = GetUSB()
-        Ports = PortsnNames[0]  #get serial to connect with  0 is ports, 1 is names
-        Names=PortsnNames[1]
+        Ports, Names = GetUSB()
         with open('setup.inf','wb') as f:
                 pickle.dump([Names], f)
         ConnectPrinterMenuOptionCreator.Main()
@@ -300,8 +292,16 @@ def EndProgram():
 def test():
     print("functionality")
 
-def ButtonEnable():
-    pass
+
+def AddToQueue():
+    global printnumber
+    global filepath
+    QueueDialog.show()
+    printnumber = "1"
+    QueueUI.PrintNumEdit.setText(printnumber)
+    filepath = "..."
+    QueueUI.lbl_FileName.setText(filepath)
+    
 
 def FileDialogBox():
     global filepath
@@ -358,6 +358,45 @@ def VerifyAddItemEntry():
         ui.list_PrintQueue.addItem(pumpstring)
         
 
+def EnableButtons():
+    if ui.listPrinterList.count() == 0:
+        ui.btn_MoveDown.setEnabled(False)
+        ui.btn_MoveUp.setEnabled(False)
+        ui.btn_Disconnect.setEnabled(False)
+        ui.btn_addItem.setEnabled(False)   
+        ui.btn_clearList.setEnabled(False)
+        ui.btn_Print.setEnabled(False)
+
+        ui.actionMove_Selected_Down_2.setEnabled(False)
+        ui.actionMove_Selected_Up.setEnabled(False)
+        ui.actionRemove_Selected_Item.setEnabled(False)
+        ui.actionAdd_Item.setEnabled(False)
+        ui.actionRemove_Selected_Item.setEnabled(False)
+        ui.actionDisconnect_Selected.setEnabled(False)
+        ui.actionClear_List.setEnabled(False)
+        ui.actionPrint.setEnabled(False)
+        ui.actionEdit_Item_Properties.setEnabled(False)
+        ui.actionMove_Selected.setEnabled(False)
+
+    else:
+        ui.btn_MoveDown.setEnabled(True)
+        ui.btn_MoveUp.setEnabled(True)
+        ui.btn_Disconnect.setEnabled(True)
+        ui.btn_addItem.setEnabled(True)   
+        ui.btn_clearList.setEnabled(True)
+        ui.btn_Print.setEnabled(True)
+
+        ui.actionMove_Selected_Down_2.setEnabled(True)
+        ui.actionMove_Selected_Up.setEnabled(True)
+        ui.actionRemove_Selected_Item.setEnabled(True)
+        ui.actionAdd_Item.setEnabled(True)
+        ui.actionRemove_Selected_Item.setEnabled(True)
+        ui.actionDisconnect_Selected.setEnabled(True)
+        ui.actionClear_List.setEnabled(True)
+        ui.actionPrint.setEnabled(True)
+        ui.actionEdit_Item_Properties.setEnabled(True)
+        ui.actionMove_Selected.setEnabled(True)
+        
         
 
 def FunctionGuiMap():
@@ -426,6 +465,7 @@ if __name__ == "__main__":
     ui.setupUi(window)
     SetupDialogs()
     FunctionGuiMap()
+    EnableButtons()
     window.show()
     sys.exit(app.exec_())
 
