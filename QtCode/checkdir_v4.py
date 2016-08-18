@@ -207,14 +207,16 @@ def MoveDown():
 
 #get printer connection
 def ConPrint():
+    connectDialog.Ports, connectDialog.Names = GetUSB()
     ConnectDialog.show()
     
-def ConnectToPrinter(self):
+def ConnectToPrinter():
     
     global conPorts
     global firstRun
+    
     if firstRun == False:
-        Ports, Names = GetUSB()
+        connectDialog.Ports, connectDialog.Names = GetUSB()
         with open('setup.inf','wb') as f:
                 pickle.dump([Names], f)
         ConnectPrinterMenuOptionCreator.Main()
