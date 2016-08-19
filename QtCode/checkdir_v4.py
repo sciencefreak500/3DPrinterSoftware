@@ -208,6 +208,10 @@ def MoveDown():
 #get printer connection
 def ConPrint():
     connectDialog.Ports, connectDialog.Names = GetUSB()
+    #if you want to test the functionality, add an append to Names. Like below:
+    #connectDialog.Names.append("UltMaker")
+    #add as many as you want! It works!!!!
+    SetupDialogs()
     ConnectDialog.show()
     
 def ConnectToPrinter():
