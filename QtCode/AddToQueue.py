@@ -27,7 +27,6 @@ class Ui_Dialog(object):
         Dialog.setObjectName(_fromUtf8("Dialog"))
         Dialog.resize(200, 261)
         Dialog.setMinimumSize(QtCore.QSize(250, 261))
-        Dialog.setMaximumSize(QtCore.QSize(250, 261))
         self.verticalLayout_2 = QtGui.QVBoxLayout(Dialog)
         self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
         self.verticalLayout = QtGui.QVBoxLayout()

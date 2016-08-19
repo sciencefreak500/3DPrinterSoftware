@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'PrintProgramUI_v2.ui'
+# Form implementation generated from reading ui file 'PrintProgramUI.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -51,7 +51,7 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.listPrinterList.setFont(font)
         self.listPrinterList.setDragEnabled(False)
-        self.listPrinterList.setDragDropMode(QtGui.QAbstractItemView.DragDrop)
+        self.listPrinterList.setDragDropMode(QtGui.QAbstractItemView.NoDragDrop)
         self.listPrinterList.setDefaultDropAction(QtCore.Qt.MoveAction)
         self.listPrinterList.setSelectionRectVisible(False)
         self.listPrinterList.setObjectName(_fromUtf8("listPrinterList"))
@@ -126,7 +126,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addLayout(self.BackLayout)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 715, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 715, 21))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName(_fromUtf8("menuFile"))

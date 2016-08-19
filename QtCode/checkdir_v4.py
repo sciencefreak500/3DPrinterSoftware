@@ -210,9 +210,28 @@ def ConPrint():
     connectDialog.Ports, connectDialog.Names = GetUSB()
     #if you want to test the functionality, add an append to Names. Like below:
     connectDialog.Names.append("UltMaker")
+    connectDialog.Ports.append("testport")
+
+    connectDialog.Names.append("Testbot")
+    connectDialog.Ports.append("testport2")
+
+    connectDialog.Names.append("SOmeMaker")
+    connectDialog.Ports.append("testport3")
     #add as many as you want! It works!!!!
     SetupDialogs()
+    FunctionGuiMap()
     ConnectDialog.show()
+
+def PrintConnect():
+    for index, i in enumerate(ConnectUI.checkbox):
+        if i.isChecked():
+            printerstring = connectDialog.Names[index] + " | " + connectDialog.Ports[index]
+            ui.listPrinterList.addItem(printerstring)
+            #insert serial
+            EnableButtons()
+            
+            
+        
     
 def ConnectToPrinter():
     
@@ -247,7 +266,7 @@ def ConnectToPrinter():
                 self.connectPrinterLabel.set("Connected to "+str(conPrinters))
         n=0
         while n<len(conPorts) and conPorts[0]!='[]':
-            ser=serial.Serial(conPorts[n],250000,timeout=1) #(port, baudrate, timeout
+            ser = serial.Serial(conPorts[n],250000,timeout=1) #(port, baudrate, timeout
             print(serial.Serial.get_settings(ser))
             print(ser.readline())
             ser.write(b'''G92 E0
@@ -425,6 +444,8 @@ def FunctionGuiMap():
     QueueUI.checkBox.clicked.connect(test)
     QueueUI.PrintNumEdit.textChanged.connect(CheckItemNumberEntry)
     QueueUI.buttonBox.accepted.connect(VerifyAddItemEntry)
+
+    ConnectUI.buttonBox.accepted.connect(PrintConnect)
 
    
 

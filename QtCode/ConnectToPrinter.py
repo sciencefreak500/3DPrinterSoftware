@@ -34,7 +34,6 @@ class Ui_Dialog(object):
         Dialog.setObjectName(_fromUtf8("Dialog"))
         Dialog.resize(200, 261)
         Dialog.setMinimumSize(QtCore.QSize(200, 261))
-        Dialog.setMaximumSize(QtCore.QSize(200, 261))
         self.verticalLayout_2 = QtGui.QVBoxLayout(Dialog)
         self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
         self.verticalLayout = QtGui.QVBoxLayout()
@@ -55,9 +54,7 @@ class Ui_Dialog(object):
             self.checkbox[index].setObjectName(_fromUtf8(Names[index]))
             if checker == (True,True):
                 guiplacement += 1
-                checker = (False,False)
-                
-            print(guiplacement)               
+                checker = (False,False)             
 
             if checker == (False,False):
                 self.formLayout.setWidget(guiplacement, QtGui.QFormLayout.LabelRole, self.checkbox[index])
