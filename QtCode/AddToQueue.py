@@ -7,6 +7,8 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
+Names = []
+Ports = []
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -23,7 +25,14 @@ except AttributeError:
         return QtGui.QApplication.translate(context, text, disambig)
 
 class Ui_Dialog(object):
+    def __init__(self):
+        self.checkbox = []
+    
+    
     def setupUi(self, Dialog):
+        global Names, Ports
+
+        
         Dialog.setObjectName(_fromUtf8("Dialog"))
         Dialog.resize(200, 261)
         Dialog.setMinimumSize(QtCore.QSize(250, 261))
@@ -52,8 +61,7 @@ class Ui_Dialog(object):
         self.horizontalLayout_2.addWidget(self.PrintNumEdit)
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
         self.verticalLayout.addLayout(self.verticalLayout_3)
-        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.verticalLayout.addItem(spacerItem)
+        
         self.label = QtGui.QLabel(Dialog)
         self.label.setMaximumSize(QtCore.QSize(16777215, 15))
         self.label.setObjectName(_fromUtf8("label"))
@@ -61,47 +69,25 @@ class Ui_Dialog(object):
         self.buttonList = QtGui.QFormLayout()
         self.buttonList.setObjectName(_fromUtf8("buttonList"))
 
-        
-        self.checkBox = QtGui.QCheckBox(Dialog)
-        self.checkBox.setObjectName(_fromUtf8("checkBox"))
-        self.buttonList.setWidget(0, QtGui.QFormLayout.LabelRole, self.checkBox)
-        
-        self.checkBox_2 = QtGui.QCheckBox(Dialog)
-        self.checkBox_2.setObjectName(_fromUtf8("checkBox_2"))
-        self.buttonList.setWidget(1, QtGui.QFormLayout.LabelRole, self.checkBox_2)
-        
-        self.checkBox_3 = QtGui.QCheckBox(Dialog)
-        self.checkBox_3.setObjectName(_fromUtf8("checkBox_3"))
-        self.buttonList.setWidget(1, QtGui.QFormLayout.FieldRole, self.checkBox_3)
-        
-        self.checkBox_4 = QtGui.QCheckBox(Dialog)
-        self.checkBox_4.setObjectName(_fromUtf8("checkBox_4"))
-        self.buttonList.setWidget(2, QtGui.QFormLayout.LabelRole, self.checkBox_4)
-        
-        self.checkBox_5 = QtGui.QCheckBox(Dialog)
-        self.checkBox_5.setObjectName(_fromUtf8("checkBox_5"))
-        self.buttonList.setWidget(3, QtGui.QFormLayout.LabelRole, self.checkBox_5)
-        
-        self.checkBox_6 = QtGui.QCheckBox(Dialog)
-        self.checkBox_6.setObjectName(_fromUtf8("checkBox_6"))
-        self.buttonList.setWidget(4, QtGui.QFormLayout.LabelRole, self.checkBox_6)
-        
-        self.checkBox_7 = QtGui.QCheckBox(Dialog)
-        self.checkBox_7.setObjectName(_fromUtf8("checkBox_7"))
-        self.buttonList.setWidget(4, QtGui.QFormLayout.FieldRole, self.checkBox_7)
-        
-        self.checkBox_8 = QtGui.QCheckBox(Dialog)
-        self.checkBox_8.setObjectName(_fromUtf8("checkBox_8"))
-        self.buttonList.setWidget(3, QtGui.QFormLayout.FieldRole, self.checkBox_8)
-        
-        self.checkBox_9 = QtGui.QCheckBox(Dialog)
-        self.checkBox_9.setObjectName(_fromUtf8("checkBox_9"))
-        self.buttonList.setWidget(2, QtGui.QFormLayout.FieldRole, self.checkBox_9)
-        
-        self.checkBox_10 = QtGui.QCheckBox(Dialog)
-        self.checkBox_10.setObjectName(_fromUtf8("checkBox_10"))
-        self.buttonList.setWidget(0, QtGui.QFormLayout.FieldRole, self.checkBox_10)
 
+        guiplacement = 0
+        checker = (False,False)
+        for index,i in enumerate(Names):
+            self.checkbox.append(QtGui.QCheckBox(Dialog))
+            self.checkbox[index].setObjectName(_fromUtf8(Names[index]))
+            if checker == (True,True):
+                guiplacement += 1
+                checker = (False,False)             
+
+            if checker == (False,False):
+                self.buttonList.setWidget(guiplacement, QtGui.QFormLayout.LabelRole, self.checkbox[index])
+                checker = (True,False)
+            elif checker == (True,False):
+                self.buttonList.setWidget(guiplacement, QtGui.QFormLayout.FieldRole, self.checkbox[index])
+                checker = (True,True)
+            self.checkbox[index].setText(_translate("Dialog", Names[index], None))
+
+        
         
         self.verticalLayout.addLayout(self.buttonList)
         self.verticalLayout_2.addLayout(self.verticalLayout)
@@ -110,6 +96,9 @@ class Ui_Dialog(object):
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName(_fromUtf8("buttonBox"))
         self.verticalLayout_2.addWidget(self.buttonBox)
+
+        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem)
 
         self.retranslateUi(Dialog)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
@@ -122,20 +111,7 @@ class Ui_Dialog(object):
         self.lbl_FileName.setText(_translate("Dialog", "...", None))
         self.lbl_NumPrints.setText(_translate("Dialog", "Number of Prints: ", None))
         self.label.setText(_translate("Dialog", "Select Printers for the job: ", None))
-        self.checkBox.setText(_translate("Dialog", "CheckBox", None))
-        self.checkBox_2.setText(_translate("Dialog", "CheckBox", None))
-        self.checkBox_3.setText(_translate("Dialog", "CheckBox", None))
-        self.checkBox_4.setText(_translate("Dialog", "CheckBox", None))
-        self.checkBox_5.setText(_translate("Dialog", "CheckBox", None))
-        self.checkBox_6.setText(_translate("Dialog", "CheckBox", None))
-        self.checkBox_7.setText(_translate("Dialog", "CheckBox", None))
-        self.checkBox_8.setText(_translate("Dialog", "CheckBox", None))
-        self.checkBox_9.setText(_translate("Dialog", "CheckBox", None))
-        self.checkBox_10.setText(_translate("Dialog", "CheckBox", None))
-
-
-
-
+                
 
 
 

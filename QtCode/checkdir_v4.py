@@ -29,7 +29,7 @@ if it gives you trouble. Good luck! Have fun!
 import subprocess
 import sys
 import pickle
-
+import time
 import os.path
 import PrintProgramUI as gui
 import AddToQueue as queueDialog
@@ -53,6 +53,10 @@ conPrinters = []
 filepath = ""
 printnumbers = ""
 
+GetUSB_Names = []
+GetUSB_Ports = []
+Listed_Names = []
+Listed_Ports = []
 
 #Add on to the devices by adding to the list in the categories. make sure the element index is the same, the devide and vendor id's are in decimal
 Printers = {'DeviceName':["Ultimaker2","Bukito"],
@@ -207,108 +211,65 @@ def MoveDown():
 
 #get printer connection
 def ConPrint():
-    connectDialog.Ports, connectDialog.Names = GetUSB()
-    #if you want to test the functionality, add an append to Names. Like below:
-    connectDialog.Names.append("UltMaker")
-    connectDialog.Ports.append("testport")
+    #if you want to test the functionality, use below:
+    
+    GetUSB_Names = ["TestMaker","Buki-tester"]
+    GetUSB_Ports = ["COM4","COM3"]
 
-    connectDialog.Names.append("Testbot")
-    connectDialog.Ports.append("testport2")
+    #if using test, comment out the line below:
+    #GetUSB_Ports, GetUSB_Names = GetUSB()
+    
+    connectDialog.Ports = list(set(GetUSB_Ports) - set(Listed_Ports))
+    connectDialog.Names = list(set(GetUSB_Names) - set(Listed_Names))
 
-    connectDialog.Names.append("SOmeMaker")
-    connectDialog.Ports.append("testport3")
-    #add as many as you want! It works!!!!
     SetupDialogs()
-    FunctionGuiMap()
+    ConnectUI.buttonBox.accepted.connect(PrintConnect)
     ConnectDialog.show()
+    print(connectDialog.Names)
+
+
+def SerialConnect(Port):
+    ser = serial.Serial(Port,250000,timeout=1) #(port, baudrate, timeout
+    ser.write(b'''G92 E0
+G28''') #Homes printer, should work for all printers
+    time.sleep(1)
+    ser.write(b'''G92 E0
+G28''')
+    ser.close()
+
+
+def TestPrint(Port):
+    ser = serial.Serial(Port,250000,timeout=1) #(port, baudrate, timeout
+    with open("bukito_tram_code.gcode", "rb") as f:
+        data = f.read()
+        ser.write(data)
+    ser.close()
+
+
+
 
 def PrintConnect():
     for index, i in enumerate(ConnectUI.checkbox):
         if i.isChecked():
             printerstring = connectDialog.Names[index] + " | " + connectDialog.Ports[index]
+            Listed_Names.append(connectDialog.Names[index])
+            Listed_Ports.append(connectDialog.Names[index])
             ui.listPrinterList.addItem(printerstring)
-            #insert serial
+            #TestPrint(connectDialog.Ports[index]) #disable this when working with tests!!!
             EnableButtons()
+
+
+def DisconnectPrinter():
+    for i in ui.listPrinterList.selectedItems():
+        ui.listPrinterList.takeItem(ui.listPrinterList.row(i))
+
+        for index, j in enumerate(Listed_Names):
+            if j in str(i.text()):
+                Listed_Ports.pop(index)
+                Listed_Names.pop(index)
+    EnableButtons()
+                
             
-            
-        
-    
-def ConnectToPrinter():
-    
-    global conPorts
-    global firstRun
-    
-    if firstRun == False:
-        connectDialog.Ports, connectDialog.Names = GetUSB()
-        with open('setup.inf','wb') as f:
-                pickle.dump([Names], f)
-        ConnectPrinterMenuOptionCreator.Main()
-        with open('setup.inf','rb') as f:
-            Printers=pickle.load(f)
-        if Names==[]:
-            self.connectPrinterLabel.set("No Printer was Found") #no names were found in pyserial.comports
-        else:
-            firstRun = True
-            conPorts=[]
-            Printers=Printers[0]
-            n= 0 
-            while n<len(Names):
-                global conPrinters
-                if str(Printers[n])=='1':
-                    conPrinters.append(Names[n])  #if connected, put this in the list of connected printers
-                    conPorts.append(Ports[n])
-                n+=1
-            if str(conPorts)=='[]':
-                self.connectPrinterLabel.set("No Printer was Selected")
-                firstRun = False
-            else:
-                self.connectPrinterText.set("Disconnect Printer")
-                self.connectPrinterLabel.set("Connected to "+str(conPrinters))
-        n=0
-        while n<len(conPorts) and conPorts[0]!='[]':
-            ser = serial.Serial(conPorts[n],250000,timeout=1) #(port, baudrate, timeout
-            print(serial.Serial.get_settings(ser))
-            print(ser.readline())
-            ser.write(b'''G92 E0
-G28''') #Homes printer, should work for all printers
-            print(ser.readline())
-            ser.close()
-            n+=1 
-    else:
-        print("pause queue") 
-        firstRun = False
-        conPrinters=[]
-        conPorts=[]
-        self.connectPrinterText.set("Connect Printer")
-        self.connectPrinterLabel.set("")
-'''
- 
-def __init__(self, master=None):
-    self.CompareList = []
-
-    Frame.__init__(self, master)
-    self.grid()
-    self.createWidgets()
-    self.loadList()
-
-
-
-
-root = Tk()
-entry = Entry()
-def handle(event):
-    event.widget.insert(0, event.data)
-
-
-app = Application(master=root)
-app.mainloop()
-try:
-    root.destroy()
-except:
-    SaveState()
-
-'''
-
 def EndProgram():
     sys.exit(app.exec_())
 
@@ -321,7 +282,14 @@ def test():
 def AddToQueue():
     global printnumber
     global filepath
+
+    queueDialog.Ports, queueDialog.Names = Listed_Ports, Listed_Names
+    SetupDialogs()
+    QueueUI.btn_FileDialog.clicked.connect(FileDialogBox)
+    QueueUI.PrintNumEdit.textChanged.connect(CheckItemNumberEntry)
+    QueueUI.buttonBox.accepted.connect(VerifyAddItemEntry)
     QueueDialog.show()
+    
     printnumber = "1"
     QueueUI.PrintNumEdit.setText(printnumber)
     filepath = "..."
@@ -435,17 +403,14 @@ def FunctionGuiMap():
     ui.btn_MoveDown.clicked.connect(MoveDown)
     ui.btn_MoveUp.clicked.connect(MoveUp)
     ui.btn_Connect.clicked.connect(ConPrint)
-    ui.btn_Disconnect.clicked.connect(test)
+    ui.btn_Disconnect.clicked.connect(DisconnectPrinter)
     ui.btn_addItem.clicked.connect(AddToQueue)   #important
     ui.btn_clearList.clicked.connect(test)
     ui.btn_Print.clicked.connect(test)
 
-    QueueUI.btn_FileDialog.clicked.connect(FileDialogBox)
-    QueueUI.checkBox.clicked.connect(test)
-    QueueUI.PrintNumEdit.textChanged.connect(CheckItemNumberEntry)
-    QueueUI.buttonBox.accepted.connect(VerifyAddItemEntry)
+    
 
-    ConnectUI.buttonBox.accepted.connect(PrintConnect)
+    
 
    
 
