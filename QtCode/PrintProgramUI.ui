@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>715</width>
+    <width>636</width>
     <height>532</height>
    </rect>
   </property>
@@ -99,53 +99,6 @@
             </property>
            </spacer>
           </item>
-          <item>
-           <layout class="QVBoxLayout" name="vertMiddleButtonLayout">
-            <item>
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_MoveUp">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>↑</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_MoveDown">
-              <property name="text">
-               <string>↓</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="verticalSpacer">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
          </layout>
         </item>
        </layout>
@@ -198,6 +151,9 @@
             <pointsize>12</pointsize>
            </font>
           </property>
+          <property name="cursor" stdset="0">
+           <cursorShape>OpenHandCursor</cursorShape>
+          </property>
           <property name="dragEnabled">
            <bool>true</bool>
           </property>
@@ -227,7 +183,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>715</width>
+     <width>636</width>
      <height>21</height>
     </rect>
    </property>
@@ -251,9 +207,6 @@
      <string>Edit</string>
     </property>
     <addaction name="actionEdit_Item_Properties"/>
-    <addaction name="separator"/>
-    <addaction name="actionMove_Selected_Up"/>
-    <addaction name="actionMove_Selected_Down_2"/>
     <addaction name="separator"/>
     <addaction name="actionPreferences"/>
     <addaction name="actionConfigure"/>

@@ -34,6 +34,7 @@ import os.path
 import PrintProgramUI as gui
 import AddToQueue as queueDialog
 import ConnectToPrinter as connectDialog
+import atexit
 ## non-native ##
 
 import serial
@@ -68,21 +69,33 @@ Printers = {'DeviceName':["Ultimaker2","Bukito"],
 ####### FUNCTIONS #######
 
 def SaveState():
-    global CurrentQueue
+    QueueItemList = []
+    for i in range(0,ui.list_PrintQueue.count()):
+        tempItem = ui.list_PrintQueue.item(i)
+        DataStore = {'Display':tempItem.data(0),'Data':tempItem.data(32)}
+        QueueItemList.append(DataStore)
     with open('setup.inf','wb') as f:
-        pickle.dump([CurrentQueue], f)
+        pickle.dump(QueueItemList, f)
+    print("saved")
 
 
 def InitializeProgram():
-    global CurrentQueue
+    global QueueItemList
     try:
         with open('setup.inf','rb') as f:
-            CurrentQueue = pickle.load(f)
-            print (CurrentQueue)
+            QueueItemList = pickle.load(f)
+            print("loaded")
     except:
+            print("not avail, setting up")
             file = open('setup.inf','wb')
             file.close()
-    
+            return
+
+    for i in QueueItemList:
+        tempitem = queueDialog.QtGui.QListWidgetItem()
+        tempitem.setText(i['Display'])
+        tempitem.setData(queueDialog.QtCore.Qt.UserRole,i['Data'])
+        ui.list_PrintQueue.addItem(tempitem)
                 
 # gets devices from pyserial by vidpid, pumps to ConnectToPrinter 
 def GetUSB():
@@ -109,20 +122,7 @@ def GetUSB():
 def loadList(self):
     for i in CurrentQueue:
         x = i[0]
-        y = str(str(x['Name'])+" " * 5 + str(x['Printers']) + " " * 5 +str(x['Number']))
-        
-
-
-
-    
-def RemoveFromQueue():
-    print("remove from queue")
-    #index = self.QueueList.index(ACTIVE)
-    #self.QueueList.delete(index)
-    #CurrentQueue[index] = None
-    #CurrentQueue.remove(None)
-    SaveState()
-	
+        y = str(str(x['Name'])+" " * 5 + str(x['Printers']) + " " * 5 +str(x['Number']))	
 	
 #THE ACUAL PRINT FUNCTION
 def SendToPrinter(self):
@@ -246,8 +246,6 @@ def TestPrint(Port):
     ser.close()
 
 
-
-
 def PrintConnect():
     for index, i in enumerate(ConnectUI.checkbox):
         if i.isChecked():
@@ -256,27 +254,58 @@ def PrintConnect():
             Listed_Ports.append(connectDialog.Names[index])
             ui.listPrinterList.addItem(printerstring)
             #TestPrint(connectDialog.Ports[index]) #disable this when working with tests!!!
-            EnableButtons()
+    EnableButtons()
 
 
 def DisconnectPrinter():
-    for i in ui.listPrinterList.selectedItems():
-        ui.listPrinterList.takeItem(ui.listPrinterList.row(i))
+    if len(ui.listPrinterList.selectedItems()) == 0:
+        msg = queueDialog.QtGui.QMessageBox()
+        msg.setText("Select the printer and try again.")
+        msg.setWindowTitle("Disconnect Printer")
+        msg.exec_()
+    else:
+        for i in ui.listPrinterList.selectedItems():
+            ui.listPrinterList.takeItem(ui.listPrinterList.row(i))
 
-        for index, j in enumerate(Listed_Names):
-            if j in str(i.text()):
-                Listed_Ports.pop(index)
-                Listed_Names.pop(index)
+            for index, j in enumerate(Listed_Names):
+                if j in str(i.text()):
+                    Listed_Ports.pop(index)
+                    Listed_Names.pop(index)
     EnableButtons()
                 
-            
-def EndProgram():
-    sys.exit(app.exec_())
+   
 
-
+def ClearQueue():
+    qt = queueDialog.QtGui
+    msg = qt.QMessageBox()
+    if ui.list_PrintQueue.count() == 0:
+        msg.setText("Nothing in the Printer Queue.")
+        msg.setWindowTitle("Clear Printer Queue")
+        msg.exec_()
+    else:
+        result = qt.QMessageBox.question(qt.QWidget(), 'Message',
+                                         "Do you like Python?",
+                                         qt.QMessageBox.Yes | qt.QMessageBox.No,
+                                         qt.QMessageBox.No)
+        if result == qt.QMessageBox.Yes:
+            ui.list_PrintQueue.clear()
+            SaveState()
+        
 
 def test():
     print("functionality")
+
+
+def RemoveFromQueue():
+    if len(ui.list_PrintQueue.selectedItems()) == 0:
+        msg = queueDialog.QtGui.QMessageBox()
+        msg.setText("Select item and try again.")
+        msg.setWindowTitle("Remove Item")
+        msg.exec_()
+    else:
+        for i in ui.list_PrintQueue.selectedItems():
+            ui.list_PrintQueue.takeItem(ui.list_PrintQueue.row(i))
+        SaveState()
 
 
 def AddToQueue():
@@ -330,7 +359,6 @@ def CheckItemNumberEntry():
 def VerifyAddItemEntry():
     global filepath
     global printnumber
-    global CurrentQueue
     error = False
     if filepath == "...":
         error = True
@@ -344,24 +372,30 @@ def VerifyAddItemEntry():
         AddToQueue()
 
     else:
-        #print(filepath, printnumber)
-        tempdict = {'Name':filepath.split('/')[-1], 'Path':filepath, 'Number':printnumber}
-        CurrentQueue.append(tempdict)
+        printers = []
+        for index, i in enumerate(QueueUI.checkbox):
+            if i.isChecked():
+                printers.append(i.text())
+        tempdict = {'Name':filepath.split('/')[-1],
+                    'Path':filepath,
+                    'Number':printnumber,
+                    'Printers':printers }
         pumpstring = tempdict['Name'] + " | " + tempdict['Number']
-        ui.list_PrintQueue.addItem(pumpstring)
+        tempitem = queueDialog.QtGui.QListWidgetItem()
+        tempitem.setText(pumpstring)
+        tempitem.setData(queueDialog.QtCore.Qt.UserRole,tempdict)
+        ui.list_PrintQueue.addItem(tempitem)
+          
+        SaveState()
         
 
 def EnableButtons():
     if ui.listPrinterList.count() == 0:
-        ui.btn_MoveDown.setEnabled(False)
-        ui.btn_MoveUp.setEnabled(False)
         ui.btn_Disconnect.setEnabled(False)
         ui.btn_addItem.setEnabled(False)   
         ui.btn_clearList.setEnabled(False)
         ui.btn_Print.setEnabled(False)
 
-        ui.actionMove_Selected_Down_2.setEnabled(False)
-        ui.actionMove_Selected_Up.setEnabled(False)
         ui.actionRemove_Selected_Item.setEnabled(False)
         ui.actionAdd_Item.setEnabled(False)
         ui.actionRemove_Selected_Item.setEnabled(False)
@@ -372,15 +406,12 @@ def EnableButtons():
         ui.actionMove_Selected.setEnabled(False)
 
     else:
-        ui.btn_MoveDown.setEnabled(True)
-        ui.btn_MoveUp.setEnabled(True)
+
         ui.btn_Disconnect.setEnabled(True)
         ui.btn_addItem.setEnabled(True)   
         ui.btn_clearList.setEnabled(True)
         ui.btn_Print.setEnabled(True)
 
-        ui.actionMove_Selected_Down_2.setEnabled(True)
-        ui.actionMove_Selected_Up.setEnabled(True)
         ui.actionRemove_Selected_Item.setEnabled(True)
         ui.actionAdd_Item.setEnabled(True)
         ui.actionRemove_Selected_Item.setEnabled(True)
@@ -390,7 +421,10 @@ def EnableButtons():
         ui.actionEdit_Item_Properties.setEnabled(True)
         ui.actionMove_Selected.setEnabled(True)
         
-        
+            
+def EndProgram():
+    sys.exit(app.exec_())
+    
 
 def FunctionGuiMap():
 
@@ -400,31 +434,20 @@ def FunctionGuiMap():
         
     '''GuiButtons'''
     #MainWindow
-    ui.btn_MoveDown.clicked.connect(MoveDown)
-    ui.btn_MoveUp.clicked.connect(MoveUp)
     ui.btn_Connect.clicked.connect(ConPrint)
     ui.btn_Disconnect.clicked.connect(DisconnectPrinter)
     ui.btn_addItem.clicked.connect(AddToQueue)   #important
-    ui.btn_clearList.clicked.connect(test)
+    ui.btn_clearList.clicked.connect(ClearQueue)
     ui.btn_Print.clicked.connect(test)
-
-    
-
-    
-
-   
 
     ''' MenuBar'''
     #MainWindow
-    ui.actionMove_Selected_Down_2.triggered.connect(MoveDown)
-    ui.actionMove_Selected_Up.triggered.connect(MoveUp)
     ui.actionRemove_Selected_Item.triggered.connect(RemoveFromQueue)
     ui.actionExit.triggered.connect(EndProgram)
     ui.actionAdd_Item.triggered.connect(AddToQueue)    #important
-    ui.actionRemove_Selected_Item.triggered.connect(test)
-    ui.actionDisconnect_Selected.triggered.connect(test)
+    ui.actionDisconnect_Selected.triggered.connect(DisconnectPrinter)
     ui.actionConnect.triggered.connect(ConPrint)
-    ui.actionClear_List.triggered.connect(test)
+    ui.actionClear_List.triggered.connect(ClearQueue)
     ui.actionPrint.triggered.connect(test)
     ui.actionEdit_Item_Properties.triggered.connect(test)
     ui.actionMove_Selected.triggered.connect(test)
@@ -449,16 +472,26 @@ def SetupDialogs():
     ConnectUI.setupUi(ConnectDialog)
 
 
+class PrintGui(gui.QtGui.QMainWindow):
+    def __init__(self, parent=None):
+        gui.QtGui.QMainWindow.__init__(self,parent)
+
+    def closeEvent(self,event):
+        SaveState()
+        event.accept()
+
 #the main program
 if __name__ == "__main__":
     app = gui.QtGui.QApplication(sys.argv)
-    window = gui.QtGui.QMainWindow()
+    window = PrintGui()
     ui = gui.Ui_MainWindow()
     ui.setupUi(window)
     SetupDialogs()
     FunctionGuiMap()
     EnableButtons()
     window.show()
+    InitializeProgram()
+    atexit.register(SaveState)
     sys.exit(app.exec_())
 
 
