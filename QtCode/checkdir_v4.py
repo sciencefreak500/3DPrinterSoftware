@@ -48,8 +48,7 @@ CurrentQueue = []
 #		 Device Name, Number of prints, [list of printers connected]
 
 #its better to use bool than int. True/False 
-firstRun = False
-sending = False
+
 conPrinters = []
 filepath = ""
 printnumbers = ""
@@ -64,8 +63,6 @@ Printers = {'DeviceName':["Ultimaker2","Bukito"],
             'Shortname': ["Ult2","Buk"],
             'ID': ["2341:0042","5824:1155",]
 			}
-
-
 ####### FUNCTIONS #######
 
 def SaveState():
@@ -117,12 +114,6 @@ def GetUSB():
         return Ports, Names #this is the path to the printer
 		#sends out comports, and Names in PortsnNames
 
-
-
-def loadList(self):
-    for i in CurrentQueue:
-        x = i[0]
-        y = str(str(x['Name'])+" " * 5 + str(x['Printers']) + " " * 5 +str(x['Number']))	
 	
 #THE ACUAL PRINT FUNCTION
 def SendToPrinter(self):
@@ -169,46 +160,6 @@ G28''')
         print("pause queue")
 
 		
-def MoveUp():
-    '''l = self.QueueList
-    try:
-        pos = list(l.curselection())[0]
-    except:
-        return
-    if pos == 0:
-        return
-    text = l.get(pos) 
-    l.delete(pos)
-    l.insert(pos-1, text)
-    l.selection_set(pos-1)
-
-    a = CurrentQueue[pos]
-    b = CurrentQueue[pos-1]
-    CurrentQueue[pos] = b
-    CurrentQueue[pos-1] = a'''
-    print("move up")
-    SaveState()
-
-def MoveDown():
-    '''l = self.QueueList
-    try:
-        pos = list(l.curselection())[0]
-    except:
-        return
-    if pos == len(l.get(0, END))-1:
-        return
-    text = l.get(pos)
-    l.delete(pos)
-    l.insert(pos+1, text)
-    l.selection_set(pos+1)
-
-    a = CurrentQueue[pos]
-    b = CurrentQueue[pos+1]
-    CurrentQueue[pos] = b
-    CurrentQueue[pos+1] = a'''
-    print("move down")
-    SaveState()
-
 #get printer connection
 def ConPrint():
     #if you want to test the functionality, use below:
@@ -283,8 +234,8 @@ def ClearQueue():
         msg.setWindowTitle("Clear Printer Queue")
         msg.exec_()
     else:
-        result = qt.QMessageBox.question(qt.QWidget(), 'Message',
-                                         "Do you like Python?",
+        result = qt.QMessageBox.question(qt.QWidget(), 'Clear Printer Queue',
+                                         "Are you sure you want to clear all items?",
                                          qt.QMessageBox.Yes | qt.QMessageBox.No,
                                          qt.QMessageBox.No)
         if result == qt.QMessageBox.Yes:
@@ -406,7 +357,6 @@ def EnableButtons():
         ui.actionMove_Selected.setEnabled(False)
 
     else:
-
         ui.btn_Disconnect.setEnabled(True)
         ui.btn_addItem.setEnabled(True)   
         ui.btn_clearList.setEnabled(True)
@@ -419,19 +369,14 @@ def EnableButtons():
         ui.actionClear_List.setEnabled(True)
         ui.actionPrint.setEnabled(True)
         ui.actionEdit_Item_Properties.setEnabled(True)
-        ui.actionMove_Selected.setEnabled(True)
-        
+        ui.actionMove_Selected.setEnabled(True)      
             
 def EndProgram():
     sys.exit(app.exec_())
     
 
 def FunctionGuiMap():
-
-    #printer list: listPrinterList
-    #queue list: list_PrintQueue
-
-        
+       
     '''GuiButtons'''
     #MainWindow
     ui.btn_Connect.clicked.connect(ConPrint)
@@ -456,8 +401,6 @@ def FunctionGuiMap():
     ui.actionAbout.triggered.connect(test)
     ui.actionDocumentation.triggered.connect(test)
 
-    
-    
 def SetupDialogs():
     global QueueDialog
     global ConnectDialog
