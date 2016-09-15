@@ -166,6 +166,33 @@
          </widget>
         </item>
         <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QPushButton" name="btn_Edit">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Edit Selected</string>
+            </property>
+            <property name="flat">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_Remove">
+            <property name="text">
+             <string>Remove Selected</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
          <widget class="QPushButton" name="btn_Print">
           <property name="text">
            <string>Print</string>
@@ -184,7 +211,7 @@
      <x>0</x>
      <y>0</y>
      <width>636</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -192,6 +219,7 @@
      <string>File</string>
     </property>
     <addaction name="actionAdd_Item"/>
+    <addaction name="actionEdit_Selected_Item"/>
     <addaction name="actionRemove_Selected_Item"/>
     <addaction name="actionClear_List"/>
     <addaction name="separator"/>
@@ -301,6 +329,11 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionEdit_Selected_Item">
+   <property name="text">
+    <string>Edit Selected Item</string>
    </property>
   </action>
  </widget>

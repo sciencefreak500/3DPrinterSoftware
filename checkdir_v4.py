@@ -121,12 +121,11 @@ def SendToPrinter(self):
     global sending
     if sending == False:
         sending = True
-        #self.printqueueText.set("Stop Printing Queue")
         while str(CurrentQueue)!='[]':
             sub = CurrentQueue[0]
             x = sub[0]
             while 0 < x['Number']:
-                #while loop is for counting for number of prints - backwards
+                #while loop is for counting number of prints - backwards
                 x['Number'] = int(x['Number']) - 1
                 sub[0] = x
                 CurrentQueue[0] = sub
@@ -275,6 +274,8 @@ def AddToQueue():
     filepath = "..."
     QueueUI.lbl_FileName.setText(filepath)
     
+def EditQueueItem():
+    print('functionality')
 
 def FileDialogBox():
     global filepath
@@ -346,7 +347,10 @@ def EnableButtons():
         ui.btn_addItem.setEnabled(False)   
         ui.btn_clearList.setEnabled(False)
         ui.btn_Print.setEnabled(False)
+        ui.btn_Edit.setEnabled(False)
+        ui.btn_Remove.setEnabled(False)
 
+        ui.actionEdit_Selected_Item.setEnabled(False)
         ui.actionRemove_Selected_Item.setEnabled(False)
         ui.actionAdd_Item.setEnabled(False)
         ui.actionRemove_Selected_Item.setEnabled(False)
@@ -361,7 +365,10 @@ def EnableButtons():
         ui.btn_addItem.setEnabled(True)   
         ui.btn_clearList.setEnabled(True)
         ui.btn_Print.setEnabled(True)
+        ui.btn_Edit.setEnabled(True)
+        ui.btn_Remove.setEnabled(True)
 
+        ui.actionEdit_Selected_Item.setEnabled(True)
         ui.actionRemove_Selected_Item.setEnabled(True)
         ui.actionAdd_Item.setEnabled(True)
         ui.actionRemove_Selected_Item.setEnabled(True)
@@ -384,10 +391,13 @@ def FunctionGuiMap():
     ui.btn_addItem.clicked.connect(AddToQueue)   #important
     ui.btn_clearList.clicked.connect(ClearQueue)
     ui.btn_Print.clicked.connect(test)
+    ui.btn_Edit.clicked.connect(EditQueueItem)
+    ui.btn_Remove.clicked.connect(RemoveFromQueue)
 
     ''' MenuBar'''
     #MainWindow
     ui.actionRemove_Selected_Item.triggered.connect(RemoveFromQueue)
+    ui.actionEdit_Selected_Item.triggered.connect(EditQueueItem)
     ui.actionExit.triggered.connect(EndProgram)
     ui.actionAdd_Item.triggered.connect(AddToQueue)    #important
     ui.actionDisconnect_Selected.triggered.connect(DisconnectPrinter)
