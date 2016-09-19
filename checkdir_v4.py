@@ -42,6 +42,7 @@ import serial.tools.list_ports as listports
 
 ####### SCRIPT VARIABLES #######
 
+sending=False
 CurrentQueue = []
 
 # CurrentQueue structure:
@@ -121,6 +122,7 @@ def SendToPrinter(self):
     global sending
     if sending == False:
         sending = True
+        ui.btn_Print.setText('Stop Print')
         while str(CurrentQueue)!='[]':
             sub = CurrentQueue[0]
             x = sub[0]
@@ -129,10 +131,10 @@ def SendToPrinter(self):
                 x['Number'] = int(x['Number']) - 1
                 sub[0] = x
                 CurrentQueue[0] = sub
-                self.QueueList.delete(0)
+                #self.QueueList.delete(0)
                 if x['Number']>0:
                     y = str(str(x['Name'])+" " * 5 + str(x['Printers']) + " " * 5 + str(x['Number']))  #format for tkinter
-                    self.QueueList.insert(0,y)
+                    #self.QueueList.insert(0,y)
                     gfile = open(x['Path'])
 					#actual connection to serial below
                     ser = serial.Serial(conPorts[0],250000,timeout=1) #(port, baudrate, timeout) needs to be able to handle more than one printer, also needs to stopgrabbing program
@@ -154,8 +156,7 @@ G28''')
             CurrentQueue.pop(0) #get rid of first item,
     else:
         sending = False
-        self.printqueueText.set("Print Queue")
-        self.QueueList.itemconfig(0,{'bg':'white'})  #done printing or didnt do anything
+        ui.btn_Print.setText('Print')  #done printing or didnt do anything
         print("pause queue")
 
 		
@@ -275,7 +276,10 @@ def AddToQueue():
     QueueUI.lbl_FileName.setText(filepath)
     
 def EditQueueItem():
-    print('functionality')
+    selectedItem=ui.list_PrintQueue.currentItem()
+    print(ui.list_PrintQueue.currentItem())
+    print(selectedItem.text())
+    ui.list_PrintQueue.editItem(ui.list_PrintQueue.currentItem())
 
 def FileDialogBox():
     global filepath
@@ -390,7 +394,7 @@ def FunctionGuiMap():
     ui.btn_Disconnect.clicked.connect(DisconnectPrinter)
     ui.btn_addItem.clicked.connect(AddToQueue)   #important
     ui.btn_clearList.clicked.connect(ClearQueue)
-    ui.btn_Print.clicked.connect(test)
+    ui.btn_Print.clicked.connect(SendToPrinter)
     ui.btn_Edit.clicked.connect(EditQueueItem)
     ui.btn_Remove.clicked.connect(RemoveFromQueue)
 
@@ -403,8 +407,8 @@ def FunctionGuiMap():
     ui.actionDisconnect_Selected.triggered.connect(DisconnectPrinter)
     ui.actionConnect.triggered.connect(ConPrint)
     ui.actionClear_List.triggered.connect(ClearQueue)
-    ui.actionPrint.triggered.connect(test)
-    ui.actionEdit_Item_Properties.triggered.connect(test)
+    ui.actionPrint.triggered.connect(SendToPrinter)
+    ui.actionEdit_Item_Properties.triggered.connect(EditQueueItem)
     ui.actionMove_Selected.triggered.connect(test)
     ui.actionPreferences.triggered.connect(test)
     ui.actionConfigure.triggered.connect(test)
