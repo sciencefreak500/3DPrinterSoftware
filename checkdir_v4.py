@@ -42,6 +42,7 @@ import serial.tools.list_ports as listports
 
 ####### SCRIPT VARIABLES #######
 
+editStatus=False
 sending=False
 CurrentQueue = []
 
@@ -276,10 +277,13 @@ def AddToQueue():
     QueueUI.lbl_FileName.setText(filepath)
     
 def EditQueueItem():
-    selectedItem=ui.list_PrintQueue.currentItem()
-    print(ui.list_PrintQueue.currentItem())
-    print(selectedItem.text())
-    ui.list_PrintQueue.editItem(ui.list_PrintQueue.currentItem())
+    global editStatus
+    editStatus=True
+    print(ui.list_PrintQueue.row(ui.list_PrintQueue.currentItem()))
+    AddToQueue()
+    dev = ui.list_PrintQueue.item(0)
+    for i in range(0,50):
+        print(dev.data(i))
 
 def FileDialogBox():
     global filepath
@@ -315,6 +319,7 @@ def CheckItemNumberEntry():
 def VerifyAddItemEntry():
     global filepath
     global printnumber
+    global editStatus
     error = False
     if filepath == "...":
         error = True
@@ -340,7 +345,12 @@ def VerifyAddItemEntry():
         tempitem = queueDialog.QtGui.QListWidgetItem()
         tempitem.setText(pumpstring)
         tempitem.setData(queueDialog.QtCore.Qt.UserRole,tempdict)
-        ui.list_PrintQueue.addItem(tempitem)
+        if editStatus==True:
+            ui.list_PrintQueue.insertItem(ui.list_PrintQueue.row(ui.list_PrintQueue.currentItem()),tempitem)
+            editStatus=False
+            RemoveFromQueue()
+        else:
+            ui.list_PrintQueue.addItem(tempitem)
           
         SaveState()
         
