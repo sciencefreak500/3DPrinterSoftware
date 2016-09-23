@@ -8,21 +8,6 @@ files are located on the computer, their location and filename
 is stored in the list, and you can modify this array as you see fit.
 '''
 
-
-
-'''
-<<<<<CHRIS>>>>>
-
-Just a note, right now, the ConnectToPrinter function does not work because
-This is what I am currently working on. You may have to pyuic4 the ConnectToPrinter.ui
-file. Type this into terminal:
-
-pyuic4 ConnectToPrinter.ui -o ConnectToPrinter.py
-
-if it gives you trouble. Good luck! Have fun!
-
-'''
-
 ####### IMPORTS #######
 
 
@@ -61,9 +46,9 @@ Listed_Names = []
 Listed_Ports = []
 
 #Add on to the devices by adding to the list in the categories. make sure the element index is the same, the devide and vendor id's are in decimal
-Printers = {'DeviceName':["Ultimaker2","Bukito"],
-            'Shortname': ["Ult2","Buk"],
-            'ID': ["2341:0042","5824:1155",]
+Printers = {'DeviceName':["Ultimaker2","Bukito","Ultimaker2?"],
+            'Shortname': ["Ult2","Buk","Ult2?"],
+            'ID': ["2341:0042","5824:1155","9025:66"]
 			}
 ####### FUNCTIONS #######
 
@@ -104,11 +89,14 @@ def GetUSB():
         DeviceName = Printers['DeviceName']
         ID = Printers['ID']
         device = listports.comports()
+        print(device)
         for i in device:
                 vid = str(i.vid)
                 pid = str(i.pid)
                 PortID = vid + ":" + pid
+                print(PortID)
                 for n, x in enumerate(ID):
+                        print(x)
                         if x == PortID:
                                 Path = str(i.device)
                                 Ports.append(Path)
@@ -165,11 +153,12 @@ G28''')
 def ConPrint():
     #if you want to test the functionality, use below:
     
-    GetUSB_Names = ["TestMaker","Buki-tester"]
-    GetUSB_Ports = ["COM4","COM3"]
+    #GetUSB_Names = ["TestMaker","Buki-tester"]
+    #GetUSB_Ports = ["COM4","COM3"]
 
     #if using test, comment out the line below:
-    #GetUSB_Ports, GetUSB_Names = GetUSB()
+    GetUSB_Ports, GetUSB_Names = GetUSB()
+    print(GetUSB_Ports,GetUSB_Names,GetUSB())
     
     connectDialog.Ports = list(set(GetUSB_Ports) - set(Listed_Ports))
     connectDialog.Names = list(set(GetUSB_Names) - set(Listed_Names))
@@ -205,7 +194,7 @@ def PrintConnect():
             Listed_Names.append(connectDialog.Names[index])
             Listed_Ports.append(connectDialog.Names[index])
             ui.listPrinterList.addItem(printerstring)
-            #TestPrint(connectDialog.Ports[index]) #disable this when working with tests!!!
+            TestPrint(connectDialog.Ports[index]) #disable this when working with tests!!!
     EnableButtons()
 
 
@@ -319,6 +308,7 @@ def CheckItemNumberEntry():
 def VerifyAddItemEntry():
     global filepath
     global printnumber
+    global printers
     global editStatus
     error = False
     if filepath == "...":
@@ -341,7 +331,8 @@ def VerifyAddItemEntry():
                     'Path':filepath,
                     'Number':printnumber,
                     'Printers':printers }
-        pumpstring = tempdict['Name'] + " | " + tempdict['Number']
+        print(printers)
+        pumpstring = tempdict['Name'] + " | " + tempdict['Number'] + " | " + str(tempdict['Printers'])
         tempitem = queueDialog.QtGui.QListWidgetItem()
         tempitem.setText(pumpstring)
         tempitem.setData(queueDialog.QtCore.Qt.UserRole,tempdict)
