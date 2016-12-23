@@ -39,6 +39,30 @@
          </widget>
         </item>
         <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QCheckBox" name="checkArduino">
+            <property name="text">
+             <string>Arduino</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkNetwork">
+            <property name="text">
+             <string>Network</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
          <widget class="QListWidget" name="listPrinterList">
           <property name="enabled">
            <bool>true</bool>
@@ -85,21 +109,7 @@
       <item>
        <layout class="QVBoxLayout" name="vertMiddlePillar">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
+         <layout class="QHBoxLayout" name="horizontalLayout"/>
         </item>
        </layout>
       </item>

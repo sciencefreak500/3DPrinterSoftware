@@ -46,9 +46,9 @@ Listed_Names = []
 Listed_Ports = []
 
 #Add on to the devices by adding to the list in the categories. make sure the element index is the same, the devide and vendor id's are in decimal
-Printers = {'DeviceName':["Ultimaker2","Bukito","Ultimaker2?"],
-            'Shortname': ["Ult2","Buk","Ult2?"],
-            'ID': ["2341:0042","5824:1155","9025:66"]
+Printers = {'DeviceName':["Arduino","Ultimaker2","Bukito","Ultimaker2?"],
+            'Shortname': ["Ard","Ult2","Buk","Ult2?"],
+            'ID': ["9025:1","2341:0042","5824:1155","9025:66"]
 			}
 ####### FUNCTIONS #######
 
@@ -193,9 +193,13 @@ def PrintConnect():
             printerstring = connectDialog.Names[index] + " | " + connectDialog.Ports[index]
             Listed_Names.append(connectDialog.Names[index])
             Listed_Ports.append(connectDialog.Names[index])
-            ui.listPrinterList.addItem(printerstring)
-            TestPrint(connectDialog.Ports[index]) #disable this when working with tests!!!
-    EnableButtons()
+            if connectDialog.Names[index]=='Arduino':
+                print("Arduino Found")
+                ui.checkArduino.setChecked(True)
+            else:
+                ui.listPrinterList.addItem(printerstring)
+            #TestPrint(connectDialog.Ports[index]) #disable this when working with tests!!!
+    #EnableButtons()
 
 
 def DisconnectPrinter():
@@ -212,7 +216,7 @@ def DisconnectPrinter():
                 if j in str(i.text()):
                     Listed_Ports.pop(index)
                     Listed_Names.pop(index)
-    EnableButtons()
+    #EnableButtons()
                 
    
 
@@ -446,7 +450,7 @@ if __name__ == "__main__":
     ui.setupUi(window)
     SetupDialogs()
     FunctionGuiMap()
-    EnableButtons()
+    #EnableButtons()
     window.show()
     InitializeProgram()
     atexit.register(SaveState)
