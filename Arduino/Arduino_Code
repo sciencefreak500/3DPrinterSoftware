@@ -16,13 +16,15 @@
  http://www.arduino.cc/en/Tutorial/SerialEvent
 
  */
-
+int led1 = 13;
+int led2 = 12;
 String inputString = "";         // a string to hold incoming data
 boolean stringComplete = false;  // whether the string is complete
 
 void setup() {
   // initialize serial:
-  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(led1, OUTPUT);
+  pinMode(led2, OUTPUT);
   Serial.begin(9600);
   // reserve 200 bytes for the inputString:
   inputString.reserve(200);
@@ -30,10 +32,19 @@ void setup() {
 
 void loop() {
   // print the string when a newline arrives:
-  if (inputString=="sweep\n") {
-    digitalWrite(LED_BUILTIN, HIGH);
+  if (inputString=="sweep1\n") {
+    digitalWrite(led1, HIGH);
     delay(300);
-    digitalWrite(LED_BUILTIN,LOW);
+    digitalWrite(led1,LOW);
+    // clear the string:
+    inputString = "";
+    stringComplete = false;
+    Serial.println("ok");
+  }
+  if (inputString=="sweep2\n") {
+    digitalWrite(led2, HIGH);
+    delay(300);
+    digitalWrite(led2,LOW);
     // clear the string:
     inputString = "";
     stringComplete = false;
@@ -60,5 +71,4 @@ void serialEvent() {
     }
   }
 }
-
 

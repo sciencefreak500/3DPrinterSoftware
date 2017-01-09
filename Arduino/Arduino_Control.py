@@ -24,11 +24,12 @@ if Found:
 	ser = serial.Serial(Port,9600,timeout=5)
 	print(serial.Serial.get_settings(ser))
 	while True:
-		choice=input('Read, Write, or Exit? (r,w,e)')
-		if choice=='r':
+		choice=input('Read, Write, or Exit? (1,2,e)')
+		if choice=='1':
+			ser.write(b'sweep1\n')
 			print(ser.readline())
-		elif choice=='w':
-			ser.write(b'sweep\n')
+		elif choice=='2':
+			ser.write(b'sweep2\n')
 			print(ser.readline())
 		else:
 			break
