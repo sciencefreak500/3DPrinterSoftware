@@ -120,12 +120,9 @@ def SendToPrinter(self):
                 x['Number'] = int(x['Number']) - 1
                 sub[0] = x
                 CurrentQueue[0] = sub
-                #self.QueueList.delete(0)
                 if x['Number']>0:
-                    y = str(str(x['Name'])+" " * 5 + str(x['Printers']) + " " * 5 + str(x['Number']))  #format for tkinter
-                    #self.QueueList.insert(0,y)
                     gfile = open(x['Path'])
-					#actual connection to serial below
+                    #actual connection to serial below
                     ser = serial.Serial(conPorts[0],250000,timeout=1) #(port, baudrate, timeout) needs to be able to handle more than one printer, also needs to stopgrabbing program
                     print(serial.Serial.get_settings(ser))
                     print(ser.readline())
